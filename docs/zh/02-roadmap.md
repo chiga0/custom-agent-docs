@@ -244,6 +244,56 @@
 - Large repo fixture 不会意外超出 context budget。
 - Release 可以在干净机器安装使用。
 
+## M10：Remote、Extensions 与 Automations
+
+目标周期：M9 之后单独评估。
+
+目标：在 core/event/permission/replay 稳定后，扩展 remote-control、插件化和后台自动化能力。
+
+任务：
+
+- Remote control / remote execution：
+  - 设计 remote runner protocol。
+  - 抽象 workspace capability、artifact sync、remote command policy。
+  - 让 Web/mobile/CLI 都通过同一 session event API 控制远端任务。
+- Plugin and extension system：
+  - 设计 provider plugin registry。
+  - 设计 custom skill package 安装与版本策略。
+  - 设计 MCP server/plugin 配置隔离。
+  - 建立插件权限声明、审计和禁用机制。
+- Mobile and remote-control client：
+  - 设计 lightweight mobile control surface。
+  - 只提供 session list、transcript、permission approval、notification 和 job control。
+  - 不在移动端实现 agent orchestration。
+- Scheduled/background automations：
+  - 设计 job trigger model。
+  - 设计 schedule policy、permission review、audit log 和 failure handling。
+  - 后台任务必须复用 session/event/replay，而不是另起一套任务系统。
+- Product-level multi-agent exploration：
+  - 研究 session graph、task delegation、agent role、conflict resolution。
+  - 不允许在 core 稳定前引入多 agent runtime。
+
+验收：
+
+- Remote execution 与 local execution 在 event/replay 层语义一致。
+- 插件不能绕过 schema、permission、memory audit 和 mainline rules。
+- Mobile/remote-control client 不拥有 agent core 逻辑。
+- Scheduled automations 具备审计、权限和失败复盘能力。
+
+## Deferred Research：Memory 与 Self-Evolution
+
+目标周期：M10 后再评估。
+
+研究项：
+
+- Vector-store memory：
+  - 评估检索质量、隐私边界、安全风险、可解释性和回滚策略。
+  - 在 Markdown/reviewed memory 不够用前不进入主线实现。
+- Self-modifying system prompts / self-evolving agent：
+  - 只允许 proposal/review/apply/rollback 模式。
+  - 不允许 agent 静默修改系统提示词、权限策略或主线规则。
+  - 必须先通过 ADR 和安全 review。
+
 ## Roadmap 完成规则
 
 任何 milestone 不能只靠代码完成，必须同时满足：

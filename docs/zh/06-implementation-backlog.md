@@ -739,3 +739,93 @@
 验收：
 
 - Release candidates 必须通过完整 beta regression suite。
+
+## M10：Remote、Extensions 与 Automations
+
+M10 在 M9 之后启动，当前仅保留规划级 backlog，不建议实现。
+
+### M10-01：Remote Runner Architecture ADR
+
+依赖：M8-03、M9-01
+
+交付：
+
+- Remote runner protocol ADR。
+- Remote workspace capability model。
+- Artifact sync 与 audit model。
+- Remote permission forwarding。
+
+测试：
+
+- Contract fixture design。
+- Permission parity design。
+
+验收：
+
+- Remote execution 不改变 core event/replay contract。
+
+### M10-02：Plugin Registry Architecture ADR
+
+依赖：M5-02、M6-02
+
+交付：
+
+- Provider plugin registry design。
+- Skill package install/version design。
+- MCP server plugin isolation design。
+- Plugin permission declaration model。
+
+测试：
+
+- Plugin metadata fixture design。
+- Disabled plugin behavior design。
+
+验收：
+
+- 插件系统不能绕过 schema、permission、memory audit 和 mainline rules。
+
+### M10-03：Mobile Remote-Control Design
+
+依赖：M8-03、M10-01
+
+交付：
+
+- Mobile control surface design。
+- Permission approval UX。
+- Session notification model。
+- Job control model。
+
+测试：
+
+- Mobile control event fixture design。
+
+验收：
+
+- 移动端只作为 remote-control client，不拥有 agent orchestration。
+
+### M10-04：Scheduled Automation Architecture ADR
+
+依赖：M1-04、M3-01、M9-02
+
+交付：
+
+- Job trigger model。
+- Schedule policy。
+- Background permission model。
+- Audit and failure replay model。
+
+测试：
+
+- Scheduled job event fixture design。
+- Permission denial/retry design。
+
+验收：
+
+- 定时任务复用 session/event/replay，不另建隐藏任务系统。
+
+## Deferred Research：Vector Memory 与 Self-Evolution
+
+这些项目当前不进入 implementation backlog，只允许调研或 ADR 草案。
+
+- Vector-store memory：等 reviewed Markdown memory 证明不足后再评估。
+- Self-modifying system prompts：必须先有 proposal/review/apply/rollback 模型和安全 ADR。

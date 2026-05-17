@@ -272,15 +272,43 @@ ACP 是 protocol adapter，不拥有业务逻辑。
 
 配置必须启动时校验，并能在 Web client 中查看。
 
-## MVP 非目标
+## MVP 范围与架构预留
 
-- Cloud execution。
-- Plugin marketplace。
-- Multi-agent teams。
-- Mobile client。
-- Background scheduled automations。
+以下能力不在 MVP 主实现中交付，但不能被架构堵死。MVP 阶段需要预留稳定边界，避免后续补能力时重写 core。
+
+### MVP 不交付，但必须预留
+
+- Remote control / remote execution。
+  - MVP 不实现云端 workspace 和远程执行平面。
+  - 但 `SessionEngine`、event stream、permission flow、artifact storage、client adapters 必须支持未来 remote runner。
+  - 远程控制必须复用同一套 event log、permission events 和 replay contract。
+- Plugin and extension system。
+  - MVP 不做插件市场。
+  - 但 provider、skills、MCP servers、local tools、client adapters 都必须按 registry/adapter 方式扩展。
+  - 后续插件不能绕过 `PermissionEngine`、schema contracts 或 mainline rules。
+- Mobile client and remote-control client。
+  - MVP 不做移动端。
+  - 但移动端应被视为 remote-control client，而不是新的 agent core。
+  - 移动端只消费 session/event/permission API，不拥有 agent orchestration。
+- Scheduled/background automations。
+  - MVP 不做定时任务。
+  - 但 session trigger、job policy、permission review、audit log 应预留后台运行语义。
+  - 自动任务不能静默执行高风险 tool，也不能绕过用户授权策略。
+- Product-level multi-agent orchestration。
+  - MVP 不做产品内多 agent 团队协作。
+  - 但当前项目开发过程允许多个开发 agent 并行，这是 repo governance 层能力，不等于产品 runtime multi-agent。
+  - 后续如加入产品内 multi-agent，必须复用 event log、session graph 和 permission model。
+
+### 明确延后研究
+
 - Vector-store memory。
+  - 暂时延后。
+  - MVP 采用可审计、可 diff、可回滚的 Markdown/reviewed memory。
+  - 后续是否加入 vector memory 取决于检索质量、隐私、安全和可解释性评估。
 - Self-modifying system prompts。
+  - 暂时延后。
+  - 不允许 agent 静默自改系统提示词或核心策略。
+  - 后续如果探索自进化 agent，必须先设计 proposal/review/apply/rollback 流程，并通过 ADR。
 
 ## 架构 Fitness Rules
 

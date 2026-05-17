@@ -44,18 +44,20 @@
 
 ## 4. Milestone 总览
 
-| Milestone                               | 状态    | 当前判断                                         | 入口文档                                                             |
-| --------------------------------------- | ------- | ------------------------------------------------ | -------------------------------------------------------------------- |
-| M0 Project Spine and Governance         | `DONE`  | 初始化完成，后续只做补强                         | [Backlog](06-implementation-backlog.md#m0项目骨架)                   |
-| M1 Event-Sourced Session Core           | `READY` | 当前推荐主攻方向                                 | [Roadmap](02-roadmap.md#m1event-sourced-session-core)                |
-| M2 Model Gateway                        | `TODO`  | 等 M1 event/session 边界稳定                     | [Roadmap](02-roadmap.md#m2model-gateway)                             |
-| M3 Local Tools and Permission Engine    | `TODO`  | 等 M1 session/event 与 M2 provider port 初步稳定 | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
-| M4 Context, Instructions and Compaction | `TODO`  | 等 M1-M3 基础能力成型                            | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
-| M5 Skills                               | `TODO`  | 等 context builder 成型                          | [Roadmap](02-roadmap.md#m5skills)                                    |
-| M6 MCP Stdio                            | `TODO`  | 等 tool router/permission engine 成型            | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
-| M7 MCP Resources, Prompts and HTTP      | `TODO`  | 等 M6 完成                                       | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
-| M8 ACP Server                           | `TODO`  | 等 core event model 和 replay 稳定               | [Roadmap](02-roadmap.md#m8acp-server)                                |
-| M9 Hardening and Beta                   | `TODO`  | 等 M1-M8 形成闭环                                | [Roadmap](02-roadmap.md#m9hardening-与-beta)                         |
+| Milestone                               | 状态       | 当前判断                                         | 入口文档                                                             |
+| --------------------------------------- | ---------- | ------------------------------------------------ | -------------------------------------------------------------------- |
+| M0 Project Spine and Governance         | `DONE`     | 初始化完成，后续只做补强                         | [Backlog](06-implementation-backlog.md#m0项目骨架)                   |
+| M1 Event-Sourced Session Core           | `READY`    | 当前推荐主攻方向                                 | [Roadmap](02-roadmap.md#m1event-sourced-session-core)                |
+| M2 Model Gateway                        | `TODO`     | 等 M1 event/session 边界稳定                     | [Roadmap](02-roadmap.md#m2model-gateway)                             |
+| M3 Local Tools and Permission Engine    | `TODO`     | 等 M1 session/event 与 M2 provider port 初步稳定 | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
+| M4 Context, Instructions and Compaction | `TODO`     | 等 M1-M3 基础能力成型                            | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
+| M5 Skills                               | `TODO`     | 等 context builder 成型                          | [Roadmap](02-roadmap.md#m5skills)                                    |
+| M6 MCP Stdio                            | `TODO`     | 等 tool router/permission engine 成型            | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
+| M7 MCP Resources, Prompts and HTTP      | `TODO`     | 等 M6 完成                                       | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
+| M8 ACP Server                           | `TODO`     | 等 core event model 和 replay 稳定               | [Roadmap](02-roadmap.md#m8acp-server)                                |
+| M9 Hardening and Beta                   | `TODO`     | 等 M1-M8 形成闭环                                | [Roadmap](02-roadmap.md#m9hardening-与-beta)                         |
+| M10 Remote, Extensions and Automations  | `TODO`     | M9 后评估，当前只做架构预留                      | [Roadmap](02-roadmap.md#m10remoteextensions-与-automations)          |
+| Deferred Research                       | `DEFERRED` | Vector memory 和 self-evolution 暂不进主线       | [Roadmap](02-roadmap.md#deferred-researchmemory-与-self-evolution)   |
 
 ## 5. 当前活跃工作
 
@@ -109,6 +111,9 @@
 - M5 skill lazy loading。
 - M6/M7 MCP。
 - M8 ACP server。
+- M10 remote runner、plugin registry、mobile remote-control、scheduled automations。
+- Vector memory。
+- Self-modifying system prompts / self-evolving agent。
 
 例外条件：
 
@@ -178,11 +183,12 @@ PR 关闭或放弃后：
 
 ## 12. 当前决策记录
 
-| 日期       | 决策                   | 原因                                           | 影响                                                    |
-| ---------- | ---------------------- | ---------------------------------------------- | ------------------------------------------------------- |
-| 2026-05-17 | 中文文档为默认维护入口 | 多 agent 协作需要统一工作语言                  | `docs/zh` 为准，`docs/en` 可滞后                        |
-| 2026-05-17 | 当前阶段推进到 M1      | M0 bootstrap 已完成                            | 新 PR 优先围绕 event log、session、replay、Web timeline |
-| 2026-05-17 | M2+ 暂不实现           | 避免 provider/tool/protocol 过早压垮 core 边界 | 只允许 ADR/spike，不允许主实现                          |
+| 日期       | 决策                   | 原因                                                     | 影响                                                       |
+| ---------- | ---------------------- | -------------------------------------------------------- | ---------------------------------------------------------- |
+| 2026-05-17 | 中文文档为默认维护入口 | 多 agent 协作需要统一工作语言                            | `docs/zh` 为准，`docs/en` 可滞后                           |
+| 2026-05-17 | 当前阶段推进到 M1      | M0 bootstrap 已完成                                      | 新 PR 优先围绕 event log、session、replay、Web timeline    |
+| 2026-05-17 | M2+ 暂不实现           | 避免 provider/tool/protocol 过早压垮 core 边界           | 只允许 ADR/spike，不允许主实现                             |
+| 2026-05-17 | 重分类 MVP 非目标      | remote/plugin/mobile/schedule 是未来能力，不应被架构排除 | M10 进入 roadmap；vector memory 与 self-evolution 延后研究 |
 
 ## 13. 更新检查清单
 

@@ -14,6 +14,7 @@
 - [07 Roadmap 状态中心](07-roadmap-status.md)
 - [08 仓库关系与协作规则](08-repository-relationship.md)
 - [ADR 0001: Core 边界](adr/0001-core-boundary.md)
+- [ADR 0002: MVP 后能力的架构预留](adr/0002-future-capability-reservation.md)
 
 ## 默认语言策略
 
