@@ -61,10 +61,9 @@
 
 ## 5. 当前活跃工作
 
-| Work ID | 状态     | Owner/Agent | Branch/PR                                                       | 范围                                          | 冲突域          | 下一步                              |
-| ------- | -------- | ----------- | --------------------------------------------------------------- | --------------------------------------------- | --------------- | ----------------------------------- |
-| M1-02   | `REVIEW` | Codex       | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) | `packages/storage` SQLite session index       | `storage-index` | Round 2 Codex implementation review PASS；等待 PR body 刷新后由 maintainer merge |
-| M1-03   | `REVIEW` | Claude      | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) | `packages/core` SessionEngine + fake provider | `core-session`  | Round 3 Codex post-rebase review PASS；等待 PR body 刷新后由 maintainer merge |
+| Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
+| ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
+| 暂无 | `-` | - | - | - | - | M1-02 / M1-03 已合入；下一步推荐认领 M1-04 Replay API |
 
 ## 6. 推荐并行切分
 
@@ -94,9 +93,9 @@
 | Work ID   | Backlog 项                 | 状态    | 依赖               | 推荐 owner 类型    | 验收摘要                                                  |
 | --------- | -------------------------- | ------- | ------------------ | ------------------ | --------------------------------------------------------- |
 | M1-01     | Append-Only Event Log      | `DONE`  | M0-03              | storage agent      | merged to main (`e0cf5aa`) — JSONL event log + replay     |
-| M1-02     | Session Index              | `REVIEW` | M1-01              | storage agent      | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) — P1/P2 已在 `93a6d45` 修复，等待 PR body 刷新 |
-| M1-03     | Fake Provider Turn         | `REVIEW` | M1-01              | core agent         | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) — P1 已在 `2af3a90` 修复并 rebase main，等待 PR body 刷新 |
-| M1-04     | Replay API                 | `TODO`  | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                        |
+| M1-02     | Session Index              | `DONE`  | M1-01              | storage agent      | merged to main (`aadeb8b`) — SQLite session/turn index + JSONL rebuild |
+| M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
+| M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                        |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream                     |
 | M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
 
@@ -201,6 +200,8 @@ PR 关闭或放弃后：
 | 2026-05-18 | M1-01 合入 main        | PR #1 通过 Round 2 mainline-guardian PASS；merge SHA `e0cf5aa` | M1-02 / M1-03 解锁，可由 storage / core agent 并行认领 |
 | 2026-05-18 | M1-03 spec 细化         | handbook agent-core / model-gateway 补齐 Session 类型、cancellation、event 顺序、fake provider 示例 | docs commit `22239a5`；M1-03 开发 agent 可直接 ramp up |
 | 2026-05-18 | 架构审计 ADR-0003       | 用户审计提出 5 个澄清点（ACP / context overflow / cwd / wire / SDK 策略）；ADR-0003 落定决策 | handbook 5 处对应同步；M2-01 deliverable 增加 context-overflow preflight；不引入 ai-sdk 作为顶层包 |
+| 2026-05-18 | M1-02 合入 main        | PR #2 通过 Round 2 implementation review PASS；merge SHA `aadeb8b` | SQLite session index 完成；M1 storage projection 可用 |
+| 2026-05-18 | M1-03 合入 main        | PR #4 通过 Round 3 post-rebase review PASS；merge SHA `34501d7` | M1-04 Replay API 解锁 |
 
 ## 13. 更新检查清单
 
