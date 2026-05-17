@@ -101,6 +101,52 @@ type ModelProvider = {
 - Usage summary。
 - Error normalization。
 
+### Fake Provider (M1-03)
+
+M1-03 阶段引入的 fake provider 用于让 SessionEngine 端到端跑通 turn 状态机，
+不接真实模型。
+
+参考实现形态：
+
+```ts
+// packages/core/src/providers/fake-provider.ts (或类似)
+export class FakeStreamingProvider implements ModelProvider {
+  id = "fake-streaming";
+  capabilities: ModelCapabilities = {
+    streaming: true,
+    toolCall: false,
+    parallelToolCall: false,
+    reasoning: false,
+    maxContextTokens: 8_000,
+  };
+
+  // chunks 可以来自构造参数，便于测试断言；缺省回固定文本
+  constructor(private readonly chunks: readonly string[] = ["Project ", "spine ", "is ", "ready."]) {}
+
+  async *stream(
+    request: ModelRequest,
+    signal: AbortSignal,
+  ): AsyncIterable<ModelStreamEvent> {
+    for (const text of this.chunks) {
+      if (signal.aborted) {
+        yield { type: "failed", reason: "aborted" };
+        return;
+      }
+      // 模拟流式延迟；测试里建议传 0 以保持快速
+      yield { type: "text_delta", delta: text };
+    }
+    yield { type: "completed", usage: { promptTokens: 0, completionTokens: 0 } };
+  }
+}
+```
+
+关键契约：
+
+- `stream` **必须** 是 AsyncGenerator (`async *`)，不能返回 Promise<Array> 然后伪装成 iterable。
+- 任意时刻 `signal.aborted === true` 时，应在下一个 yield 前结束，并发一条 `type: "failed"` 或直接 return。SessionEngine 据此把 turn 标记为 cancelled。
+- fake provider 不应该写 event log；它只 yield ModelStreamEvent，由 SessionEngine 决定哪些转译成 AgentEvent。
+- 测试用 fake provider 时，应提供可控制的 `chunks`（输入 N，预期 N 条 `model.delta`），让 turn 状态机的 golden test 稳定。
+
 ## 成熟实现
 
 后续：
