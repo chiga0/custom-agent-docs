@@ -79,6 +79,23 @@ ContextBuilder 必须知道预算：
 
 不要等 provider 报 context too long 才处理。
 
+### M2 ~ M4 中间阶段的 overflow 兜底（[[adr-0003]] T2）
+
+`ContextBuilder` + deterministic compaction 是 M4 deliverable。在 M4 完成之前，**接入真实 provider (M2-01) 必须先实现硬上限检查**：
+
+- M2 adapter 在调用 provider 前，估算 `prompt_tokens + transcript_tokens` 是否超过 `ModelProvider.capabilities.maxContextTokens`。超过时：
+  1. **不调用模型 API**。
+  2. SessionEngine 发 `turn.completed { stopReason: "error" }`，errorCode 体现 "context_overflow"（M2 schema evolution 同步加 `errorCode` 字段）。
+  3. 把 budget breakdown 落 telemetry，便于人工分流。
+- **绝不允许让模型 API 返回 4xx/5xx 后才感知超限**，因为某些 provider 在 oversize 时会 hang 或返回不确定语义。
+- M4 落地后，超限会触发 compaction → 重新尝试一次而不是直接报错；该 fallback 取代上述 stop=error。
+
+### Compaction 与 Replay
+
+- `session.compacted` event 必须记录被压缩的 sequence 范围（M4 引入到 schema）。
+- 原始事件可归档但不能删除，replay 仍需可还原压缩前的视图。
+- Compaction 后再启动新 turn 时，新 turn 的 sequence 从压缩后游标继续递增；compaction 自身的 event 也占用一个 sequence。
+
 ## Vector Memory 为什么延后
 
 Vector memory 有价值，但早期会带来：

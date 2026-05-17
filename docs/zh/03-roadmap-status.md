@@ -61,9 +61,10 @@
 
 ## 5. 当前活跃工作
 
-| Work ID | 状态   | Owner/Agent | Branch/PR                                                       | 范围                               | 冲突域        | 下一步                          |
-| ------- | ------ | ----------- | --------------------------------------------------------------- | ---------------------------------- | ------------- | ------------------------------- |
-| M1-01   | `DONE` | Codex       | [custom-agent#1](https://github.com/chiga0/custom-agent/pull/1) | `packages/storage` JSONL event log | `storage-log` | 已合入 main (`e0cf5aa`)，可清理 |
+| Work ID | 状态     | Owner/Agent | Branch/PR                                                       | 范围                                          | 冲突域          | 下一步                              |
+| ------- | -------- | ----------- | --------------------------------------------------------------- | --------------------------------------------- | --------------- | ----------------------------------- |
+| M1-02   | `REVIEW` | Codex       | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) | `packages/storage` SQLite session index       | `storage-index` | 等 reviewer agent 跑 mainline-guardian |
+| M1-03   | `REVIEW` | Claude      | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) | `packages/core` SessionEngine + fake provider | `core-session`  | 已收到 1 轮 Codex review (4 P1 + 3 P2)；作者修复中 |
 
 ## 6. 推荐并行切分
 
@@ -93,8 +94,8 @@
 | Work ID   | Backlog 项                 | 状态    | 依赖               | 推荐 owner 类型    | 验收摘要                                                  |
 | --------- | -------------------------- | ------- | ------------------ | ------------------ | --------------------------------------------------------- |
 | M1-01     | Append-Only Event Log      | `DONE`  | M0-03              | storage agent      | merged to main (`e0cf5aa`) — JSONL event log + replay     |
-| M1-02     | Session Index              | `READY` | M1-01              | storage agent      | 删除索引后可从 JSONL 重建                                 |
-| M1-03     | Fake Provider Turn         | `READY` | M1-01              | core agent         | turn state machine 有测试和 cancellation                  |
+| M1-02     | Session Index              | `REVIEW` | M1-01              | storage agent      | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) — SQLite 索引 + JSONL rebuild |
+| M1-03     | Fake Provider Turn         | `REVIEW` | M1-01              | core agent         | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) — SessionEngine + fake provider，等 4 项 P1 修复后再 merge |
 | M1-04     | Replay API                 | `TODO`  | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                        |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream                     |
 | M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
@@ -199,6 +200,7 @@ PR 关闭或放弃后：
 | 2026-05-17 | 增加技术手册           | docs repo 不只做实现记录，也要帮助开发者从零构建 agent 框架 | `docs/zh/handbook` 成为技术解释和教程入口                  |
 | 2026-05-18 | M1-01 合入 main        | PR #1 通过 Round 2 mainline-guardian PASS；merge SHA `e0cf5aa` | M1-02 / M1-03 解锁，可由 storage / core agent 并行认领 |
 | 2026-05-18 | M1-03 spec 细化         | handbook agent-core / model-gateway 补齐 Session 类型、cancellation、event 顺序、fake provider 示例 | docs commit `22239a5`；M1-03 开发 agent 可直接 ramp up |
+| 2026-05-18 | 架构审计 ADR-0003       | 用户审计提出 5 个澄清点（ACP / context overflow / cwd / wire / SDK 策略）；ADR-0003 落定决策 | handbook 5 处对应同步；M2-01 deliverable 增加 context-overflow preflight；不引入 ai-sdk 作为顶层包 |
 
 ## 13. 更新检查清单
 

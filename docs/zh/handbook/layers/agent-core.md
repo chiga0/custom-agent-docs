@@ -148,6 +148,16 @@ provider 抛错或 schema 校验失败：
 - 异常细节先记入 stderr / telemetry，**事件 payload 不允许携带堆栈** 以避免泄漏内部路径。
 - 后续的 turn 必须能正常发起，不能因前一次失败卡死。
 
+**Provider 失败 vs EventStore 失败必须区分（[[adr-0003]] T2）：** 模型流自身抛错走 `stopReason="error"`；持久化（`eventStore.append`）抛错属于 infrastructure failure，必须让 sequence 不留缺口并且把诊断分类记入 telemetry，**不可被外层 `catch` 误并入 provider failure**。具体实现 SHOULD：保留 sequence → 调 append → append 成功后递增 sequence + yield；append 失败时不递增 sequence、直接 throw 让 SessionEngine 决定后续策略。
+
+### Session ↔ cwd 不可变（[[adr-0003]] T3）
+
+- `createSession` 时绑定一个不可变 `cwd`，对应 workspace 根。
+- **SessionEngine 不暴露任何修改 cwd 的 API**；schema 也不引入 `session.cwd_changed` event。
+- 想换工作目录 → 新建 session。
+- 工具（read/write/shell）可访问 cwd 子目录的相对路径或绝对路径，但 SessionEngine 不维护 "current directory" 漫游状态。
+- 这条约束让 replay 决定性、session index 行不分裂、权限审计简单。与 Claude Code / Cursor / Aider 同业实践一致。
+
 ## 输入输出
 
 输入：

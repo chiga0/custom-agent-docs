@@ -160,6 +160,21 @@ export class FakeStreamingProvider implements ModelProvider {
 - Recorded fixtures。
 - Cost accounting。
 
+## SDK 选型策略（[[adr-0003]] T5）
+
+`ModelProvider` port 是项目自己的契约，**不**包装 `ai-sdk` / `@tanstack/ai` 这类聚合包。原因：
+
+- 这些聚合包对 capability / 工具调用做了自己的抽象，与本项目"event-sourced + 所有工具调用必须经过 PermissionEngine"的硬约束不完全契合。
+- 引入它意味着把 mainline event 模型间接绑定到上游版本节奏。
+
+**正确做法：**
+
+- adapter 内部使用厂商**官方 SDK**（`@anthropic-ai/sdk`、`openai`、`@google/genai` 等）——不重新发明 HTTP / 重试 / 流式 chunk 解析。
+- adapter 把厂商原生 chunk 类型翻译成 `ModelStreamEvent` 联合体后再交给 core。
+- core 永不直接 `import` 任何厂商 SDK；架构 fitness test 会守住该边界。
+
+**例外可豁免：** 如果将来某个 provider 没有官方 SDK 且 `ai-sdk` 覆盖了它（罕见），可以在 **单个 adapter 内部** 引用 `ai-sdk`，但 core 仍只依赖 port。
+
 ## 常见坑
 
 - Core 直接 import SDK。

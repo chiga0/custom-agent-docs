@@ -6,6 +6,21 @@ Client 和 protocol adapter 负责把 agent core 的事件流呈现给用户或�
 
 它们不拥有 agent 行为。
 
+## 内外两层区分（[[adr-0003]] T1 / T4）
+
+明确两层：
+
+- **内层（不变量，由 core 拥有）：** `AgentEvent` 是 session 真值；`SessionEngine.runTurn()` 返回 `AsyncIterable<AgentEvent>` 只是进程内抽象，**不是对外协议**。
+- **外层（每个 client 自己定义的 wire）：**
+
+| Client | Wire 协议 | 实现位置 | 状态 |
+| ------ | --------- | -------- | ---- |
+| Web | HTTP + Server-Sent Events (SSE) | `apps/web-client` + 后续 backend route | M1-04 起步规范 |
+| CLI | 进程内直接调用，按事件序列化为 ANSI/文本 | `apps/cli` | 占位中，M1-04 之后落地 |
+| ACP | JSON-RPC 2.0 over stdio（**严格遵守 Zed Agent Client Protocol**） | `apps/acp-server` | M8 deliverable |
+
+**禁止：** 直接把 `AgentEvent` JSON 通过 ws/sse 透传给外部。每个 client 都必须经过 mapper 把 `AgentEvent` 翻译成对应协议的 update 类型。不存在"自研 EventSource 协议"，async-iterable 仅用于进程内编排。
+
 Client 类型：
 
 - Web。
