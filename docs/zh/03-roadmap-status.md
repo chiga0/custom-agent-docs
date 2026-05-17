@@ -61,11 +61,9 @@
 
 ## 5. 当前活跃工作
 
-当前没有登记中的活跃 PR。
-
-| Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
-| ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-| -       | -    | -           | -         | -    | -      | -      |
+| Work ID | 状态     | Owner/Agent | Branch/PR                                                       | 范围                               | 冲突域        | 下一步               |
+| ------- | -------- | ----------- | --------------------------------------------------------------- | ---------------------------------- | ------------- | -------------------- |
+| M1-01   | `REVIEW` | Codex       | [custom-agent#1](https://github.com/chiga0/custom-agent/pull/1) | `packages/storage` JSONL event log | `storage-log` | 等待 review/CI/merge |
 
 ## 6. 推荐并行切分
 
@@ -92,14 +90,14 @@
 
 ## 7. M1 工作项状态
 
-| Work ID   | Backlog 项                 | 状态    | 依赖               | 推荐 owner 类型    | 验收摘要                                 |
-| --------- | -------------------------- | ------- | ------------------ | ------------------ | ---------------------------------------- |
-| M1-01     | Append-Only Event Log      | `READY` | M0-03              | storage agent      | committed events 可按顺序 replay         |
-| M1-02     | Session Index              | `TODO`  | M1-01              | storage agent      | 删除索引后可从 JSONL 重建                |
-| M1-03     | Fake Provider Turn         | `READY` | M1-01 可先并行设计 | core agent         | turn state machine 有测试和 cancellation |
-| M1-04     | Replay API                 | `TODO`  | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价       |
-| M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream    |
-| M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定           |
+| Work ID   | Backlog 项                 | 状态     | 依赖               | 推荐 owner 类型    | 验收摘要                                                                       |
+| --------- | -------------------------- | -------- | ------------------ | ------------------ | ------------------------------------------------------------------------------ |
+| M1-01     | Append-Only Event Log      | `REVIEW` | M0-03              | storage agent      | [custom-agent#1](https://github.com/chiga0/custom-agent/pull/1) 等待 review/CI |
+| M1-02     | Session Index              | `TODO`   | M1-01              | storage agent      | 删除索引后可从 JSONL 重建                                                      |
+| M1-03     | Fake Provider Turn         | `READY`  | M1-01 可先并行设计 | core agent         | turn state machine 有测试和 cancellation                                       |
+| M1-04     | Replay API                 | `TODO`   | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                                             |
+| M1-WEB-01 | Web Event Timeline         | `READY`  | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream                                          |
+| M1-QA-01  | Golden Transcript Fixtures | `READY`  | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                                                 |
 
 ## 8. 未开始队列
 
