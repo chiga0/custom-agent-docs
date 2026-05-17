@@ -7,6 +7,7 @@ This repository is the planning and governance source of truth for [custom-agent
 ## Source Of Truth
 
 - [中文文档入口](docs/zh/README.md)
+- [技术手册](docs/zh/handbook/README.md)
 - [Roadmap 状态中心](docs/zh/07-roadmap-status.md)
 - [仓库关系与协作规则](docs/zh/08-repository-relationship.md)
 - [架构设计](docs/zh/01-architecture-design.md)

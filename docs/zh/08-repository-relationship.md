@@ -51,6 +51,18 @@ Custom Agent 使用两个仓库：
 
 `custom-agent` 也以 `main` 为主集成分支，功能开发通过短期分支和 PR 合入。
 
+## 4.1 文档内容分层
+
+`custom-agent-docs` 不只是 implementation notes，还承担技术手册职责：
+
+- `docs/zh/handbook`：解释如何从零构建 agent 框架、每层真实作用、设计原因、实现路径和常见坑。
+- `docs/zh/01-architecture-design.md`：项目级架构设计。
+- `docs/zh/02-roadmap.md`：路线图。
+- `docs/zh/07-roadmap-status.md`：当前事实状态。
+- `docs/zh/adr`：架构决策。
+
+实现仓库中的 README 和 package 文档只描述当前代码怎么运行，不承担完整技术教材职责。
+
 ## 5. PR 顺序
 
 如果实现工作会改变 roadmap/status/ADR：

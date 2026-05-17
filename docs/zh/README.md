@@ -4,6 +4,7 @@
 
 ## 文档目录
 
+- [技术手册](handbook/README.md)
 - [00 可行性复盘](00-feasibility-review.md)
 - [01 架构设计](01-architecture-design.md)
 - [02 可执行路线图](02-roadmap.md)
