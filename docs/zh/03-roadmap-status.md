@@ -1,6 +1,6 @@
 # Roadmap 状态中心
 
-最后更新：2026-05-17
+最后更新：2026-05-18
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -61,9 +61,9 @@
 
 ## 5. 当前活跃工作
 
-| Work ID | 状态     | Owner/Agent | Branch/PR                                                       | 范围                               | 冲突域        | 下一步               |
-| ------- | -------- | ----------- | --------------------------------------------------------------- | ---------------------------------- | ------------- | -------------------- |
-| M1-01   | `REVIEW` | Codex       | [custom-agent#1](https://github.com/chiga0/custom-agent/pull/1) | `packages/storage` JSONL event log | `storage-log` | 等待 review/CI/merge |
+| Work ID | 状态   | Owner/Agent | Branch/PR                                                       | 范围                               | 冲突域        | 下一步                          |
+| ------- | ------ | ----------- | --------------------------------------------------------------- | ---------------------------------- | ------------- | ------------------------------- |
+| M1-01   | `DONE` | Codex       | [custom-agent#1](https://github.com/chiga0/custom-agent/pull/1) | `packages/storage` JSONL event log | `storage-log` | 已合入 main (`e0cf5aa`)，可清理 |
 
 ## 6. 推荐并行切分
 
@@ -90,14 +90,14 @@
 
 ## 7. M1 工作项状态
 
-| Work ID   | Backlog 项                 | 状态     | 依赖               | 推荐 owner 类型    | 验收摘要                                                                       |
-| --------- | -------------------------- | -------- | ------------------ | ------------------ | ------------------------------------------------------------------------------ |
-| M1-01     | Append-Only Event Log      | `REVIEW` | M0-03              | storage agent      | [custom-agent#1](https://github.com/chiga0/custom-agent/pull/1) 等待 review/CI |
-| M1-02     | Session Index              | `TODO`   | M1-01              | storage agent      | 删除索引后可从 JSONL 重建                                                      |
-| M1-03     | Fake Provider Turn         | `READY`  | M1-01 可先并行设计 | core agent         | turn state machine 有测试和 cancellation                                       |
-| M1-04     | Replay API                 | `TODO`   | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                                             |
-| M1-WEB-01 | Web Event Timeline         | `READY`  | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream                                          |
-| M1-QA-01  | Golden Transcript Fixtures | `READY`  | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                                                 |
+| Work ID   | Backlog 项                 | 状态    | 依赖               | 推荐 owner 类型    | 验收摘要                                                  |
+| --------- | -------------------------- | ------- | ------------------ | ------------------ | --------------------------------------------------------- |
+| M1-01     | Append-Only Event Log      | `DONE`  | M0-03              | storage agent      | merged to main (`e0cf5aa`) — JSONL event log + replay     |
+| M1-02     | Session Index              | `READY` | M1-01              | storage agent      | 删除索引后可从 JSONL 重建                                 |
+| M1-03     | Fake Provider Turn         | `READY` | M1-01              | core agent         | turn state machine 有测试和 cancellation                  |
+| M1-04     | Replay API                 | `TODO`  | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                        |
+| M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream                     |
+| M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
 
 ## 8. 未开始队列
 
@@ -197,6 +197,8 @@ PR 关闭或放弃后：
 | 2026-05-17 | M2+ 暂不实现           | 避免 provider/tool/protocol 过早压垮 core 边界              | 只允许 ADR/spike，不允许主实现                             |
 | 2026-05-17 | 重分类 MVP 非目标      | remote/plugin/mobile/schedule 是未来能力，不应被架构排除    | M10 进入 roadmap；vector memory 与 self-evolution 延后研究 |
 | 2026-05-17 | 增加技术手册           | docs repo 不只做实现记录，也要帮助开发者从零构建 agent 框架 | `docs/zh/handbook` 成为技术解释和教程入口                  |
+| 2026-05-18 | M1-01 合入 main        | PR #1 通过 Round 2 mainline-guardian PASS；merge SHA `e0cf5aa` | M1-02 / M1-03 解锁，可由 storage / core agent 并行认领 |
+| 2026-05-18 | M1-03 spec 细化         | handbook agent-core / model-gateway 补齐 Session 类型、cancellation、event 顺序、fake provider 示例 | docs commit `22239a5`；M1-03 开发 agent 可直接 ramp up |
 
 ## 13. 更新检查清单
 
