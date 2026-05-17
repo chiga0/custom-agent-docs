@@ -63,8 +63,8 @@
 
 | Work ID | 状态     | Owner/Agent | Branch/PR                                                       | 范围                                          | 冲突域          | 下一步                              |
 | ------- | -------- | ----------- | --------------------------------------------------------------- | --------------------------------------------- | --------------- | ----------------------------------- |
-| M1-02   | `REVIEW` | Codex       | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) | `packages/storage` SQLite session index       | `storage-index` | 等 reviewer agent 跑 mainline-guardian |
-| M1-03   | `REVIEW` | Claude      | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) | `packages/core` SessionEngine + fake provider | `core-session`  | 已收到 1 轮 Codex review (4 P1 + 3 P2)；作者修复中 |
+| M1-02   | `REVIEW` | Codex       | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) | `packages/storage` SQLite session index       | `storage-index` | Round 1 Codex review 完成；等待作者修复 atomic rebuild / module cycle / orphan turns / db parent dir |
+| M1-03   | `REVIEW` | Claude      | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) | `packages/core` SessionEngine + fake provider | `core-session`  | Round 2 Codex implementation review PASS；等待 rebase 到最新 main 后再 merge |
 
 ## 6. 推荐并行切分
 
@@ -94,8 +94,8 @@
 | Work ID   | Backlog 项                 | 状态    | 依赖               | 推荐 owner 类型    | 验收摘要                                                  |
 | --------- | -------------------------- | ------- | ------------------ | ------------------ | --------------------------------------------------------- |
 | M1-01     | Append-Only Event Log      | `DONE`  | M0-03              | storage agent      | merged to main (`e0cf5aa`) — JSONL event log + replay     |
-| M1-02     | Session Index              | `REVIEW` | M1-01              | storage agent      | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) — SQLite 索引 + JSONL rebuild |
-| M1-03     | Fake Provider Turn         | `REVIEW` | M1-01              | core agent         | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) — SessionEngine + fake provider，等 4 项 P1 修复后再 merge |
+| M1-02     | Session Index              | `REVIEW` | M1-01              | storage agent      | [custom-agent#2](https://github.com/chiga0/custom-agent/pull/2) — Round 1 存在 storage correctness blockers，等待修复 |
+| M1-03     | Fake Provider Turn         | `REVIEW` | M1-01              | core agent         | [custom-agent#4](https://github.com/chiga0/custom-agent/pull/4) — P1 已在 `c54b4d9` 修复，等待 rebase 最新 main |
 | M1-04     | Replay API                 | `TODO`  | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                        |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream                     |
 | M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |

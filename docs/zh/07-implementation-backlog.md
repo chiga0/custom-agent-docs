@@ -153,7 +153,7 @@
 
 验收：
 
-- Web 可以展示 backend events 的 live fake streaming。
+- SessionEngine 可以产生可 replay 的 backend fake streaming events；Web 通过真实 SSE 消费 live stream 的验收归入 M1-04 / M1-WEB-01。
 
 ### M1-04：实现 Replay API
 
