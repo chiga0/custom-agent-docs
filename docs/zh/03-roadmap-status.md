@@ -46,7 +46,7 @@
 
 | Milestone                               | 状态       | 当前判断                                         | 入口文档                                                             |
 | --------------------------------------- | ---------- | ------------------------------------------------ | -------------------------------------------------------------------- |
-| M0 Project Spine and Governance         | `DONE`     | 初始化完成，后续只做补强                         | [Backlog](06-implementation-backlog.md#m0项目骨架)                   |
+| M0 Project Spine and Governance         | `DONE`     | 初始化完成，后续只做补强                         | [Backlog](07-implementation-backlog.md#m0项目骨架)                   |
 | M1 Event-Sourced Session Core           | `READY`    | 当前推荐主攻方向                                 | [Roadmap](02-roadmap.md#m1event-sourced-session-core)                |
 | M2 Model Gateway                        | `TODO`     | 等 M1 event/session 边界稳定                     | [Roadmap](02-roadmap.md#m2model-gateway)                             |
 | M3 Local Tools and Permission Engine    | `TODO`     | 等 M1 session/event 与 M2 provider port 初步稳定 | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
@@ -209,5 +209,5 @@ PR 关闭或放弃后：
 - 活跃工作表是否有过期项。
 - Work ID 是否能追到 backlog 或 roadmap。
 - 是否引入了新的冲突域。
-- 是否需要同步 [实施 Backlog](06-implementation-backlog.md)。
+- 是否需要同步 [实施 Backlog](07-implementation-backlog.md)。
 - 是否需要新增 ADR。

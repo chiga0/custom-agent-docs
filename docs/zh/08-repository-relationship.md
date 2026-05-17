@@ -38,9 +38,9 @@ Custom Agent 使用两个仓库：
 
 实现 agent 在 `custom-agent` 开工前，应读取：
 
-- `../custom-agent-docs/docs/zh/07-roadmap-status.md`
+- `../custom-agent-docs/docs/zh/03-roadmap-status.md`
 - `../custom-agent-docs/docs/zh/02-roadmap.md`
-- `../custom-agent-docs/docs/zh/06-implementation-backlog.md`
+- `../custom-agent-docs/docs/zh/07-implementation-backlog.md`
 - `../custom-agent-docs/rules/mainline.md`
 
 ## 4. 分支策略
@@ -58,7 +58,7 @@ Custom Agent 使用两个仓库：
 - `docs/zh/handbook`：解释如何从零构建 agent 框架、每层真实作用、设计原因、实现路径和常见坑。
 - `docs/zh/01-architecture-design.md`：项目级架构设计。
 - `docs/zh/02-roadmap.md`：路线图。
-- `docs/zh/07-roadmap-status.md`：当前事实状态。
+- `docs/zh/03-roadmap-status.md`：当前事实状态。
 - `docs/zh/adr`：架构决策。
 
 实现仓库中的 README 和 package 文档只描述当前代码怎么运行，不承担完整技术教材职责。
@@ -112,7 +112,7 @@ Custom Agent 使用两个仓库：
 每个实现 agent 在 `custom-agent` 开工前：
 
 1. 拉取 `custom-agent-docs/main`。
-2. 阅读 `docs/zh/07-roadmap-status.md`。
+2. 阅读 `docs/zh/03-roadmap-status.md`。
 3. 确认目标 Work ID 是 `READY` 或已被明确分配。
 4. 检查冲突域是否已有 `IN_PROGRESS` 或 `REVIEW`。
 5. 在 implementation PR 中填写 Work ID 和 docs commit SHA。

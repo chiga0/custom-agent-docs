@@ -99,4 +99,4 @@ Self-modifying system prompts：
 ## 关联
 
 - Roadmap: [M10 Remote, Extensions 与 Automations](../02-roadmap.md#m10remoteextensions-与-automations)
-- Status: [Roadmap 状态中心](../07-roadmap-status.md)
+- Status: [Roadmap 状态中心](../03-roadmap-status.md)

@@ -4,7 +4,7 @@
 
 - Work ID：
 - 当前状态变更：
-- 是否已更新 `docs/zh/07-roadmap-status.md`：
+- 是否已更新 `docs/zh/03-roadmap-status.md`：
 - 如未更新，原因：
 
 ## Roadmap / ADR

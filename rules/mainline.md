@@ -10,7 +10,7 @@ Chinese documentation in `docs/zh` is canonical for day-to-day project planning.
 
 ## Roadmap Status Source
 
-`docs/zh/07-roadmap-status.md` is the central status source for parallel agent development. Agents must read it before opening implementation work and keep it updated through PRs.
+`docs/zh/03-roadmap-status.md` is the central status source for parallel agent development. Agents must read it before opening implementation work and keep it updated through PRs.
 
 ## What Belongs On The Mainline
 

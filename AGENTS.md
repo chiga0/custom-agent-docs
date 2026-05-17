@@ -14,7 +14,7 @@ English documentation under `docs/en` may lag behind and should be synchronized 
 
 ## Non-Negotiable Rules
 
-- `docs/zh/07-roadmap-status.md` is the central roadmap status source.
+- `docs/zh/03-roadmap-status.md` is the central roadmap status source.
 - Every implementation Work ID must be registered in the roadmap status document.
 - Architecture decisions must be captured as ADRs.
 - Status changes must explain what changed, why, and which implementation repo PR or commit they relate to.
