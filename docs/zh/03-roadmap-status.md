@@ -54,8 +54,10 @@
 | M5 Skills                               | `TODO`     | 等 context builder 成型                          | [Roadmap](02-roadmap.md#m5skills)                                    |
 | M6 MCP Stdio                            | `TODO`     | 等 tool router/permission engine 成型            | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
 | M7 MCP Resources, Prompts and HTTP      | `TODO`     | 等 M6 完成                                       | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
-| M8 ACP Server                           | `TODO`     | 等 core event model 和 replay 稳定               | [Roadmap](02-roadmap.md#m8acp-server)                                |
-| M9 Hardening and Beta                   | `TODO`     | 等 M1-M8 形成闭环                                | [Roadmap](02-roadmap.md#m9hardening-与-beta)                         |
+| M8 ACP Production Hardening             | `TODO`     | 等 M1-ACP-* + M2-M7 闭环；改名见 [[adr-0004]]    | [Roadmap](02-roadmap.md#m8acp-production-hardening)                  |
+| M9a Security Hardening                  | `TODO`     | 拆自原 M9，与 9b/9c 可并行                       | [Roadmap](02-roadmap.md#m9asecurity-hardening)                       |
+| M9b Production Ops                      | `TODO`     | 拆自原 M9                                        | [Roadmap](02-roadmap.md#m9bproduction-ops)                           |
+| M9c QA and Regression                   | `TODO`     | 拆自原 M9                                        | [Roadmap](02-roadmap.md#m9cqa--regression)                           |
 | M10 Remote, Extensions and Automations  | `TODO`     | M9 后评估，当前只做架构预留                      | [Roadmap](02-roadmap.md#m10remoteextensions-与-automations)          |
 | Deferred Research                       | `DEFERRED` | Vector memory 和 self-evolution 暂不进主线       | [Roadmap](02-roadmap.md#deferred-researchmemory-与-self-evolution)   |
 
@@ -95,8 +97,10 @@
 | M1-01     | Append-Only Event Log      | `DONE`  | M0-03              | storage agent      | merged to main (`e0cf5aa`) — JSONL event log + replay     |
 | M1-02     | Session Index              | `DONE`  | M1-01              | storage agent      | merged to main (`aadeb8b`) — SQLite session/turn index + JSONL rebuild |
 | M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
-| M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | Web replay 与 live transcript 等价                        |
-| M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream                     |
+| M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
+| M1-ACP-STDIO | ACP stdio server         | `READY` | M1-01, M1-03       | core agent         | `apps/acp-server`：Zed ACP JSON-RPC over stdio 最小子集；详见 [[adr-0004]] |
+| M1-ACP-HTTP | ACP Streamable HTTP daemon | `TODO` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec |
+| M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
 | M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
 
 ## 8. 未开始队列
@@ -202,6 +206,9 @@ PR 关闭或放弃后：
 | 2026-05-18 | 架构审计 ADR-0003       | 用户审计提出 5 个澄清点（ACP / context overflow / cwd / wire / SDK 策略）；ADR-0003 落定决策 | handbook 5 处对应同步；M2-01 deliverable 增加 context-overflow preflight；不引入 ai-sdk 作为顶层包 |
 | 2026-05-18 | M1-02 合入 main        | PR #2 通过 Round 2 implementation review PASS；merge SHA `aadeb8b` | SQLite session index 完成；M1 storage projection 可用 |
 | 2026-05-18 | M1-03 合入 main        | PR #4 通过 Round 3 post-rebase review PASS；merge SHA `34501d7` | M1-04 Replay API 解锁 |
+| 2026-05-18 | ADR-0004 ACP 统一 wire | 取消 web / cli / acp 各自一套 wire；ACP 唯一协议 + stdio / Streamable HTTP 双 transport；1 session = 1 acp-server 子进程；TUI 也走 HTTP | ADR-0003 §T1 / §T4 作废；新增 M1-ACP-STDIO / M1-ACP-HTTP work item；M8 改名 "ACP Production Hardening"；M1-04 改为 ACP HTTP session/load 子集 |
+| 2026-05-18 | M9 拆 9a / 9b / 9c      | 原 M9 体量过大（sandbox + redaction + packaging + regression 全混在一起）；按风险类型拆为 Security / Production Ops / QA & Regression；observability / config / security baseline 提前到 M1-M3 同步埋点 | 详见 02-roadmap.md M9 节 |
+| 2026-05-18 | ADR-0005 docs 站升级    | 选定 Astro Starlight + Cloudflare Pages + Pagefind + Vale；目录分 getting-started / foundations / implementation / reference / governance / advanced / adr 七大类；CI 加 docs-ref-check 守护 handbook ↔ 代码一致性 | 分 4 phase 实施；本轮完成 Phase 1（决策 + 关键新章节） |
 
 ## 13. 更新检查清单
 

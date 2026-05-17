@@ -1,5 +1,7 @@
 # Client 与 Protocol Adapters
 
+> ⚠️ **本章节部分内容已被 [[adr-0004]] 取代** —— 原"三种 wire 协议"表格 / "ACP=stdio, Web=SSE, CLI=进程内"的描述作废。新决策：统一 ACP 协议 + stdio / Streamable HTTP 两种 transport，所有 client 都是 ACP adapter。本文件 Phase 4 重写时一并更新；目前请以 [[adr-0004]] 为准。
+
 ## 真实作用
 
 Client 和 protocol adapter 负责把 agent core 的事件流呈现给用户或外部系统。

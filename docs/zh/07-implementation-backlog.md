@@ -157,12 +157,13 @@
 
 ### M1-04：实现 Replay API
 
-依赖：M1-01、M1-03
+依赖：M1-01、M1-03、M1-ACP-HTTP
 
 交付：
 
-- Session replay endpoint/API。
+- Session replay endpoint：作为 ACP Streamable HTTP `session/load` 子集，从 daemon HTTP 端点拉取 session 历史 event。
 - Normalized transcript projection。
+- 详见 [[adr-0004]]：M1-04 起 wire 直接走 ACP，不引入私有 SSE。
 
 测试：
 
@@ -171,7 +172,51 @@
 
 验收：
 
-- Web replay 与 live transcript 一致。
+- Web replay 与 live transcript 一致；两者都通过 ACP daemon HTTP 消费。
+
+### M1-ACP-STDIO：实现 apps/acp-server
+
+依赖：M1-01、M1-03
+
+交付：
+
+- `apps/acp-server` package：单进程 ACP server，按 Zed ACP 规范读 stdin / 写 stdout 处理 JSON-RPC。
+- 最小方法集：`initialize`、`session/new`、`session/prompt`、`session/cancel`、`session/update`（通知）。
+- mapper：把 `AgentEvent` 翻译为 `session/update` 通知 payload。
+- 进程内 1 session 模型；多 session 由 daemon 多 spawn 子进程实现。
+
+测试：
+
+- ACP fixture：握手 / 创建 session / runTurn 流式 update / cancel。
+- mapper round-trip 测试：相同 AgentEvent 序列经过 mapper 应产生 deterministic ACP update 序列。
+
+验收：
+
+- Zed editor 直接 spawn `apps/acp-server` 可完成一次 fake turn。
+- 详见 [[adr-0004]] §3。
+
+### M1-ACP-HTTP：实现 apps/acp-daemon
+
+依赖：M1-ACP-STDIO
+
+交付：
+
+- `apps/acp-daemon` package：HTTP+SSE 网关，监听本地端口。
+- 项目自有 "ACP Streamable HTTP" transport spec 文档（与 Zed ACP 协议分离，仅 transport 扩展）。
+- 实现 session id header / 断线重连 cursor / 默认 bearer token auth。
+- 收到 `session/new` 即 spawn 一个 `apps/acp-server` 子进程；HTTP 帧透传到子进程 stdio。
+
+测试：
+
+- HTTP 端到端 fixture：HTTP POST `session/prompt` + SSE 收 `session/update`。
+- 断线重连：客户端持 sequence cursor，断开重连后续传。
+- 多 session 并发：3 个 session 并行无串扰。
+- 子进程 crash → daemon 标记 session 失败但不影响其他 session。
+
+验收：
+
+- Web client 可通过本地 daemon 完成一次 fake turn。
+- 详见 [[adr-0004]] §3-§5。
 
 ## M2：Model Gateway
 

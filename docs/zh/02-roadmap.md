@@ -197,54 +197,108 @@
 - Prompt templates 可以由用户命令调用。
 - MCP resources 不会自动倾倒进 model context。
 
-## M8：ACP Server
+## M8：ACP Production Hardening
+
+> 2026-05-18 [[adr-0004]] 修订：M8 不再是"第一次实装 ACP"。最小 ACP 实装已被前移到 M1 末尾（**M1-ACP-STDIO / M1-ACP-HTTP**），因为 ADR-0004 把 ACP 设为唯一对外 wire 协议，所有 client（含 Web）从 M1-04 起都依赖它。M8 改为针对生产部署的 hardening。
 
 目标周期：2 周
 
-目标：把 core 暴露给 ACP-compatible clients。
+目标：把 M1 阶段落地的 ACP server / daemon 推到 production-ready。
 
 任务：
 
-- 实现 JSON-RPC server。
-- 实现 `initialize`。
-- 实现 `session/new`。
-- 实现 `session/load`。
-- 实现 `session/prompt`。
-- 实现 `session/cancel`。
-- 把 core events 转换为 ACP updates。
-- 转发 permission requests。
-- 添加 ACP protocol fixture tests。
+- ACP authentication（默认 localhost-only + bearer token，可选 mTLS）。
+- ACP rate limiting + backpressure。
+- daemon 进程监控（health check、子进程崩溃重启、僵尸进程清理）。
+- 远程化场景的 TLS termination。
+- ACP fixture suite 扩充（涵盖 error taxonomy / load 已 compaction session / 并发 session）。
+- 与 Zed 实际集成的兼容性测试（捕获 Zed ACP 上游变更）。
 
 验收：
 
-- ACP client 可以启动 session 并接收 streamed updates。
-- ACP session replay 与 Web replay 等价。
-- ACP adapter 不拥有 agent 逻辑。
-- ACP errors 有类型并被测试。
+- 单机 50+ 并发 session 不卡 / 不漏。
+- ACP error event 类型完整且被测试。
+- Zed editor 能直接挂 `apps/acp-server` 跑标准用例。
+- daemon 自动重启崩溃的 acp-server 子进程，session 视图能 replay 还原。
 
-## M9：Hardening 与 Beta
+## M9：Hardening 与 Beta（已拆分为 M9a / M9b / M9c）
 
-目标周期：3-4 周
+> 2026-05-18 audit 修订：原 M9 单 milestone 体量过大（sandbox + redaction + packaging + regression 全混在一起），按风险类型拆为三个并行 milestone。
 
-目标：让工具可靠到可以用于真实项目。
+### M9a：Security Hardening
+
+目标周期：2 周
+
+目标：完成 production deploy 前必须的安全防御。
 
 任务：
 
-- 添加 sandbox profile support。
-- 添加 secret redaction。
-- 添加 audit log export。
-- 添加 large output summarization。
-- 添加 provider retry/backoff。
-- 添加 failure taxonomy。
-- 添加 benchmark scenarios。
-- 添加 release packaging。
+- 添加 sandbox profile support（read-only / workspace-write / denied paths）。
+- 添加 secret pattern redaction（API key / token / 私钥）。
+- 添加 prompt injection 防御策略（model output / MCP resource / tool output 都要 sanitize）。
+- 写正式 threat model 文档（攻击面 / 信任域 / 缓解措施）。
+- 第三方 / 自审 security review（pen-test 风格 audit）。
 
 验收：
 
-- Regression suite 覆盖常见 coding tasks。
-- Permission bypass tests 通过。
-- Large repo fixture 不会意外超出 context budget。
-- Release 可以在干净机器安装使用。
+- 已知 dangerous shell（`rm -rf /`、`git push --force` 等）默认 deny。
+- API-key-like 字符串在落 event log 之前被 redact。
+- prompt injection 测试 fixture 覆盖 ≥ 5 类常见攻击（tool output 内带 `IGNORE PREVIOUS` 等）。
+- threat model 公开发布在 `handbook/foundations/threat-model.md`。
+
+### M9b：Production Ops
+
+目标周期：2 周
+
+目标：让 binary 能"在干净机器装上、跑起来、出问题能查"。
+
+任务：
+
+- 添加 release packaging（CLI binary / Web bundle / acp-server / acp-daemon entrypoints / 版本元数据）。
+- 添加 provider retry / backoff / rate-limit awareness。
+- 添加 failure taxonomy（哪些错误重试、哪些直接 stopReason=error）。
+- 添加结构化日志 + 可选 telemetry export（默认本地，opt-in remote）。
+- 添加 config & secrets 管理 path（OS keychain / `.env` / env var 优先级；多 provider 切换）。
+- 自动更新 / crash report 机制（opt-in）。
+
+验收：
+
+- `npm run release:dry` 可以产出可分发 artifact。
+- 干净机器从 zero 安装到首次 turn ≤ 5 min。
+- failure taxonomy 写成代码 + 文档；error event 中含 `errorCode` 字段。
+- 默认 telemetry off；on 时 schema 已落档。
+
+### M9c：QA & Regression
+
+目标周期：2 周
+
+目标：build 一个能护住 release 质量的 regression harness。
+
+任务：
+
+- 添加 golden transcript fixture suite（典型 coding task / 取消 / 失败 / MCP 调用 / compaction）。
+- 添加 Playwright Web E2E baseline（screenshot diff、approval flow）。
+- 添加 replay/live equivalence test 自动化。
+- 添加 fuzz testing（event schema、permission policy、tool args）。
+- 自定义 reference checker：handbook 引用的 function / class 在代码中仍存在。
+- benchmark scenarios（大 repo / 长 transcript / 多 turn）。
+
+验收：
+
+- regression suite 跑通后才能 release。
+- handbook ↔ 代码 drift 在 CI 报警。
+- 大 repo fixture 不会意外超出 context budget。
+- 取消 / 失败 / MCP fixture 都有 golden assert。
+
+---
+
+### 跨切关注点（M1-M3 同步埋点，不放到 M9）
+
+audit 把以下三类"基础设施"提前到 M1-M3 阶段做最小骨架，避免 M9 才补：
+
+- **Observability scaffold（M1 期内）**：结构化日志接口 + event log 已经天然是 audit trail，但需明确"哪些动作写日志、哪些不写"。M1-04 时把 SSE / ACP HTTP 的请求日志 schema 定下来。
+- **Config & Secrets baseline（M2 落 provider 时）**：API key 读写路径必须先定，否则 M9b 才补会撕大量代码。M2-01 PR 必须包含最简 config loader（env / `.env` / 默认值）和 redaction 函数 stub。
+- **Security baseline check（M3 落工具时）**：M3-03 shell tool 必须出 denylist + sandbox profile 接口（即便 sandbox 实装在 M9a）。M3-01 PermissionEngine 设计时就考虑 audit export 的字段。
 
 ## M10：Remote、Extensions 与 Automations
 
