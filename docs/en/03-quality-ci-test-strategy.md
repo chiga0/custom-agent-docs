@@ -1,3 +1,7 @@
+---
+title: "Quality, CI, and Test Strategy"
+---
+
 # Quality, CI, and Test Strategy
 
 ## Quality Bar

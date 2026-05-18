@@ -1,3 +1,7 @@
+---
+title: "Tools 与 Permissions"
+---
+
 # Tools 与 Permissions
 
 > 重写自 `handbook/layers/tool-permission.md`（A2 audit 评分 2/5）。在 M3 实装之前就把决策模型 / 风险分类 / 完整事件链讲透；M3 PR 落地时只是把本章节描述的 spec 翻译成代码。

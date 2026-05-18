@@ -16,8 +16,8 @@ export default defineConfig({
       description: "Local-first event-sourced AI coding agent framework — from-zero implementation guide",
       defaultLocale: "zh",
       locales: {
-        zh: { label: "中文", lang: "zh-CN" },
-        en: { label: "English", lang: "en" },
+        zh: { label: "中文" },
+        en: { label: "English" },
       },
       social: {
         github: "https://github.com/chiga0/custom-agent",

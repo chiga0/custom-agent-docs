@@ -1,3 +1,7 @@
+---
+title: "Remote、Plugin、Automation 预留"
+---
+
 # Remote、Plugin、Automation 预留
 
 ## 为什么现在就要想未来能力

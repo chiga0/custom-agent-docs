@@ -1,3 +1,7 @@
+---
+title: "Handbook 重构与文档站施工计划"
+---
+
 # Handbook 重构与文档站施工计划
 
 > 本文档配套 [[adr-0005]]。Phase 1 已由 2026-05-18 audit commit 完成；Phase 2-4 待下一轮工作循环逐步落地。

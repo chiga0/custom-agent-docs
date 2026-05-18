@@ -1,3 +1,7 @@
+---
+title: "ADR 0001: Core 边界与 Event-Sourced 架构"
+---
+
 # ADR 0001: Core 边界与 Event-Sourced 架构
 
 状态：Accepted

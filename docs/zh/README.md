@@ -1,3 +1,7 @@
+---
+title: "Custom Agent 中文文档"
+---
+
 # Custom Agent 中文文档
 
 中文文档是本项目默认维护入口。后续新增设计、roadmap、评审、ADR、CI 策略和 AI 协作规则，默认先写中文，再按需要同步英文。

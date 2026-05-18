@@ -1,3 +1,7 @@
+---
+title: "从零构建一套 Agent 框架"
+---
+
 # 从零构建一套 Agent 框架
 
 > 重写自 `handbook/tutorials/build-agent-from-zero.md`。原版是设计笔记；本版每个 step 含可跑代码 + checkpoint（让你知道这一步完成了）+ 指向 `custom-agent` 实际文件的引用。

@@ -1,3 +1,7 @@
+---
+title: "ADR 0002: MVP 后能力的架构预留"
+---
+
 # ADR 0002: MVP 后能力的架构预留
 
 状态：Accepted

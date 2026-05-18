@@ -1,3 +1,7 @@
+---
+title: "ADR 索引"
+---
+
 # ADR 索引
 
 所有 Architecture Decision Records 的目录。其他文档中以 `[[adr-NNNN]]` 引用本表的某个条目。

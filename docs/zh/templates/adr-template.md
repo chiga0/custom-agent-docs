@@ -1,3 +1,7 @@
+---
+title: "ADR NNNN: 标题"
+---
+
 # ADR NNNN: 标题
 
 状态：Proposed | Accepted | Rejected | Superseded

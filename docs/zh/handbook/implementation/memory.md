@@ -1,3 +1,7 @@
+---
+title: "Memory（agent 跨 turn 记住什么）"
+---
+
 # Memory（agent 跨 turn 记住什么）
 
 > 拆自 `handbook/layers/memory-context.md`。本文只讲"长期记忆"——agent 在 turn 之间应该记住什么、怎么持久化、怎么审计。**当下 turn 看到的内容（context）见 [`context.md`](context.md)**。

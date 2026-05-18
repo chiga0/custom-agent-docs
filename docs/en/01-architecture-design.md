@@ -1,3 +1,7 @@
+---
+title: "Architecture Design"
+---
+
 # Architecture Design
 
 ## Design Goal

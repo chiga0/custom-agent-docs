@@ -1,3 +1,7 @@
+---
+title: "English Docs"
+---
+
 # English Docs
 
 English documentation is kept under this directory.

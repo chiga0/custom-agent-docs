@@ -1,3 +1,7 @@
+---
+title: "Context（ContextBuilder：决定模型这一次看到什么）"
+---
+
 # Context（ContextBuilder：决定模型这一次看到什么）
 
 > 拆自 `handbook/layers/memory-context.md`。原文把"Context"（model 当下看到的）和"Memory"（agent 跨 turn 记住的）混在一起，新手读完很难分清。**本文只讲 Context；Memory 见 [`memory.md`](memory.md)**。

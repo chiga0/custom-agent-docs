@@ -1,3 +1,7 @@
+---
+title: "ADR 0004: ACP 作为统一 client-core 协议，stdio + Streamable HTTP 双 transport"
+---
+
 # ADR 0004: ACP 作为统一 client-core 协议，stdio + Streamable HTTP 双 transport
 
 状态：Accepted

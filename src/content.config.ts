@@ -13,7 +13,8 @@ export const collections = {
   docs: defineCollection({
     // 用自定义 glob loader 而不是默认 docsLoader()，是因为内容在 ./docs/
     // 而不是 ./src/content/docs/。
-    loader: glob({ pattern: "**/*.{md,mdx}", base: "./docs" }),
+    // 只读 docs/zh + docs/en 下的内容，跳过 docs/README.md 等非内容页文件
+    loader: glob({ pattern: "{zh,en}/**/*.{md,mdx}", base: "./docs" }),
     schema: docsSchema(),
   }),
 };

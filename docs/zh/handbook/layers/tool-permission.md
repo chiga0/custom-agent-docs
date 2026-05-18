@@ -1,3 +1,7 @@
+---
+title: "Tool 与 Permission 层"
+---
+
 # Tool 与 Permission 层
 
 ## 真实作用
