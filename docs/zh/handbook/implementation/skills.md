@@ -43,10 +43,11 @@ skills/
 name: mainline-guardian
 description: 在 merge 前对一个 PR 做主线对齐审查；输出 PASS/FAIL + blocking findings。
 trigger:
+  # patterns 是 case-insensitive 正则字符串数组；任一命中即注入 skill body
   patterns:
-    - "review (this )?pr"
-    - "跑一遍 mainline guardian"
-    - "merge 前检查"
+    - "(?i)review (this )?pr"
+    - "(?i)跑一遍 mainline guardian"
+    - "(?i)merge 前检查"
 allowed_tools:
   - read_file
   - search_text
@@ -94,9 +95,11 @@ body（**仅在 skill 被命中并加载时才进 context**）：完整的 SOP �
 
 **关键收益**：
 
-- 10 个 skill 注册 ≈ 800 token 常驻；命中 1 个再加 1200 → 总 2000 token。比"全部常驻"省 75%+。
+- 10 个 skill 注册 ≈ 800 token 常驻；命中 1 个再加 1200 → 总 2000 token。比"全部常驻"省 75%+。[^1]
 - 无关 skill 不会污染 prompt（模型不会被"看见"的 skill body 暗示）。
 - 跨项目复用：项目里有 50 个 skill 也只看 metadata。
+
+[^1]: 经验估算：单条 skill registry 行 = `name + description + trigger patterns + allowed_tools` ≈ 80 token / skill；body 中位数 1200-3000 token。实际数字以 ContextBuilder budget 计算为准（[`context.md`](context.md) §3）。
 
 ## 4. Skill 命中（trigger）
 
@@ -140,7 +143,7 @@ seq=N+8  tool.completed             {result: "...", durationMs: 89}
 seq=N+9  model.delta                {text: "diff 涉及 5 个文件..."}
 ... (重复 tool 调用)
 
-seq=N+M  skill.completed            {name: "mainline-guardian", finalStop: "produced PASS"}
+seq=N+M  skill.completed            {name: "mainline-guardian", outcome: "produced PASS"}
 seq=N+M+1 turn.completed            {stopReason: "final"}
 ```
 
@@ -209,7 +212,7 @@ input: tool=git_diff  →  PermissionEngine 看：
 
 | 误区 | 纠正 |
 |---|---|
-| "skill 是更高级的 prompt" | 不只是 prompt：还含 metadata、trigger、allowed_tools、audit；调用全程进 event log |
+| "skill 是更高级的 prompt" | 不只是 prompt——是 **metadata（lazy-load）+ trigger（命中策略）+ allowed_tools（沙箱）+ audit（事件链）** 四件套；调用全程进 event log |
 | "skill 命中后就可以自动跑工具" | 不行；每个工具调用仍要走 PermissionEngine；skill `allowed_tools` 只是过滤上限 |
 | "skill 可以修改 memory / instruction / policy" | 不行；durable 修改都要走 candidate / PR / policy 审批；skill 只是 turn 内工作流 |
 | "skill body 越详细越好" | 不行；body 占 context 桶；trigger 命中率低的 skill 也跟着膨胀 token 估算 |
@@ -220,7 +223,7 @@ input: tool=git_diff  →  PermissionEngine 看：
 | Step | 状态 |
 |---|---|
 | `skills/` 目录约定 + SKILL.md 模板 | ✅ 已在 `custom-agent` repo |
-| skill registry / discovery | M5-01（READY？ 见 [03-roadmap-status](../../03-roadmap-status.md)）|
+| skill registry / discovery | M5-01（状态以 [03-roadmap-status §7](../../03-roadmap-status.md) 为准）|
 | lazy-load + body inject | M5-02 |
 | trigger pattern matching | M5-02 |
 | skill UX（`/skill list`、`/skill run`）+ Web inspector | M5-03 |

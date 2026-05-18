@@ -121,6 +121,20 @@ MCP（Model Context Protocol）由 Anthropic 主导设计，是 **agent ↔ 外�
 - **crash 隔离**：一台 server crash 只影响来自该 server 的 tool；其他 tool / session 不受影响。
 - **server 不能直接进 event log**：所有可见动作都通过 `tool.*` / `mcp.*` event 流出，由 MCPClient 加工。
 
+### 3.1 Server 重启策略
+
+crash / shutdown 后是否自动重启、何时彻底放弃，按这套规则：
+
+| 阶段 | 行为 |
+|---|---|
+| 第 1 次崩溃 | 指数退避（base=500ms，cap=10s）后重 spawn / 重新 initialize；emit `mcp.server.crashed` + `mcp.server.restarting` |
+| 第 2-3 次崩溃 | 同上指数退避；累积 in-flight tool call 全部 emit `tool.failed { reason: "mcp_server_unstable" }` |
+| 第 4 次崩溃（连续 3 次重启后再崩） | 永久放弃；emit `mcp.server.permanently_failed`；从 ToolRouter 摘除；session 继续运行但该 server 的工具不可用 |
+| 主动 shutdown（用户禁用 / config 移除）| 立即 unregister，不重启；emit `mcp.server.shutdown` |
+| **In-flight tool call reconcile** | 重启后所有挂起 tool call **不自动重发**——emit `tool.failed { reason: "mcp_server_restarted" }`；让 model 在下一轮决定要不要重新调用。**禁止 client-side 自动重放，避免重复执行 destructive 副作用**。|
+
+policy 可在 `mcp.config.json` 覆盖（如关掉自动重启、或调整 cap）。
+
 ## 4. Stdio vs Streamable HTTP Transport
 
 MCP 协议本身（JSON-RPC 消息格式）不变，但 transport 有两种：
@@ -129,8 +143,8 @@ MCP 协议本身（JSON-RPC 消息格式）不变，但 transport 有两种：
 |---|---|---|
 | 部署位置 | 本地 binary，子进程 | 任意 HTTP 可达地址 |
 | 启动方式 | `child_process.spawn` | HTTP `POST /mcp/...` + SSE |
-| auth | 进程隔离即 auth | bearer token / mTLS |
-| 重连 | 子进程 crash → 重 spawn | SSE 断开 → 客户端持 sequence cursor 续传 |
+| auth | 凭进程边界隔离 + OS-level sandbox（M9a 落地）；**不等于 server 内部可信** —— stdio server 仍能访问 OS 文件系统 / 网络 | bearer token / mTLS |
+| 重连 | 子进程 crash → 按 §3.1 重启策略 | SSE 断开 → 客户端持 sequence cursor 续传 |
 | 适用场景 | 本机 dev tools（filesystem、git、jq）；离线 | 团队共享服务（私有数据库、企业 API）；远程 |
 | 启动延迟 | 50-500ms（看 binary） | 100ms-500ms（看网络） |
 
@@ -152,7 +166,7 @@ ToolRouter 的去重 / 路由规则：
 1. 用户 / model 输入的 tool 名通过严格匹配解析。
 2. 不允许 local tool 与 MCP tool **同名**（即不允许写 `mcp.fs.read_file` 把它命名成 `read_file` 让它覆盖 local）。
 3. 不同 server 的同名 tool **靠 server name 区分**：`mcp.fs.read_text` ≠ `mcp.fs-v2.read_text`。
-4. 模型给出的 tool 名如果是模糊的（"read_file"），ToolRouter 默认走 local tool；要调 MCP 必须用全名。
+4. **不接受模糊调用**：模型必须用全名（`read_file` 走 local；要调 MCP 必须显式 `mcp.<server>.<name>`）。若模型写了 ambiguous 字符串（如 "read_file" 而 local + MCP 都有同义工具），ToolRouter **emit `tool.ambiguous_call` event 并拒绝执行**——避免"用户以为调了 MCP 实际跑了 local"的静默歧义。
 
 ## 6. 一次 MCP Tool 调用的完整事件链
 
@@ -177,7 +191,7 @@ seq=N+4  permission.requested       {
                                    }
                                    ← ApprovalUI 显示给 user
                                    ← user 点 "Allow for this session"
-seq=N+5  permission.resolved        {decision: "allow", actor: "user", policyApplied: "session_allow"}
+seq=N+5  permission.resolved        {decision: "allow", actor: "user", sourcedFrom: "session_allow_once"}
 
 seq=N+6  mcp.call.started           {
                                      server: "jira",
@@ -270,6 +284,8 @@ seq=N+3  user.message              {content: <expanded ChatML 的等价 user 输
 
 - prompt 参数必须由 server schema 校验，client 端不接收 unknown 参数。
 - 展开后的 messages 视同 user.message，**仍走 ContextBuilder 装载**——不能"插队"到 system prompt。
+- **展开后的 messages 必须经过 prompt-injection 检测**（M9a 落地的 ContextBuilder filter）。恶意 server 可能在 prompt 模板里放 "You are now in admin mode..." 风格的指令字串；不能只靠"不能插队 system prompt"——还要主动扫描注入 pattern。
+- **每条展开 message 携带 `source: { mcp: { server, prompt } }` 字段**，让事后审计能从 event log 反查 "这条 user.message 实际来自哪台 MCP server 的哪个 prompt"，避免"模板看上去像用户原话"造成的归因混乱。
 
 ## 9. 与 Skill 的对比
 
@@ -315,6 +331,9 @@ MCP server **默认不可信**——这条原则比"local tool 默认信任"严�
 | resource explicit include | resources/list 拿到 50 个 resource；context 只装 user 显式 include 的 |
 | prompt schema validation | unknown argument → client 拒绝 |
 | server crash | stdio 子进程崩溃 → `mcp.server.crashed`；其他 server 不受影响 |
+| server restart policy | 重启 3 次仍崩 → `mcp.server.permanently_failed`；in-flight tool call 不自动重发 |
+| oversized output truncation | tools/call 返回 >10MB stdout → MCPClient 截断到 preview + 完整数据落 artifact storage（M9b）；event payload 不直接装大 blob |
+| ambiguous tool call | model 写裸名 `read_file` 而 local + MCP 都注册同名 → `tool.ambiguous_call` event 且不执行 |
 | secret redaction | tools/call 响应含 `sk_xxx` → 进 event log 前被 redact |
 
 ## 12. 常见误区
@@ -331,19 +350,19 @@ MCP server **默认不可信**——这条原则比"local tool 默认信任"严�
 
 ## 13. 实现状态 / Roadmap
 
-| Step | 状态 |
+| Step | 状态 / Work ID |
 |---|---|
-| MCP server config schema | M6-01 |
-| stdio 子进程生命周期 | M6-01 |
-| `initialize` / `tools/list` / `tools/call` | M6-01 + M6-02 |
-| Namespace + 注入 ToolRouter | M6-02 |
-| 经 PermissionEngine | M6-03 |
-| crash recovery | M6-03 |
-| Resources（`resources/list`、`resources/read`、explicit include） | M7-01 |
-| Prompts（`prompts/list`、`prompts/get`） | M7-02 |
-| Streamable HTTP transport | M7-03 |
-| Sandbox profile（cgroup / OS 级） | M9a |
-| Secret redaction in MCP output | M9a |
+| MCP server config schema | [M6-01](../../07-implementation-backlog.md#m6-01) |
+| stdio 子进程生命周期 | [M6-01](../../07-implementation-backlog.md#m6-01) |
+| `initialize` / `tools/list` / `tools/call` | [M6-01](../../07-implementation-backlog.md#m6-01) + [M6-02](../../07-implementation-backlog.md#m6-02) |
+| Namespace + 注入 ToolRouter | [M6-02](../../07-implementation-backlog.md#m6-02) |
+| 经 PermissionEngine | [M6-03](../../07-implementation-backlog.md#m6-03) |
+| Crash recovery + 重启策略 (§3.1) | [M6-03](../../07-implementation-backlog.md#m6-03) |
+| Resources（`resources/list`、`resources/read`、explicit include） | [M7-01](../../07-implementation-backlog.md#m7-01) |
+| Prompts（`prompts/list`、`prompts/get`） | [M7-02](../../07-implementation-backlog.md#m7-02) |
+| Streamable HTTP transport | [M7-03](../../07-implementation-backlog.md#m7-03) |
+| Sandbox profile（cgroup / OS 级） | [M9a](../../02-roadmap.md#m9asecurity-hardening) |
+| Secret redaction in MCP output | [M9a](../../02-roadmap.md#m9asecurity-hardening) |
 
 ## 14. 进一步阅读
 
