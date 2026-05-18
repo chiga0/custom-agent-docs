@@ -2,8 +2,6 @@
 title: "ADR 0003: 架构审计澄清（ACP / 通信 / cwd / provider SDK）"
 ---
 
-# ADR 0003: 架构审计澄清（ACP / 通信 / cwd / provider SDK）
-
 状态：Accepted
 
 日期：2026-05-18

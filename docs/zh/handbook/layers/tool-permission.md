@@ -2,8 +2,6 @@
 title: "Tool 与 Permission 层"
 ---
 
-# Tool 与 Permission 层
-
 ## 真实作用
 
 Tool 层让模型可以影响外部世界。Permission 层确保这种影响被控制、审计和授权。

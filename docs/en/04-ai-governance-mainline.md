@@ -2,8 +2,6 @@
 title: "AI Governance and Mainline Rules"
 ---
 
-# AI Governance and Mainline Rules
-
 ## Why This Exists
 
 This project will likely be built with heavy AI assistance. That makes drift more likely:

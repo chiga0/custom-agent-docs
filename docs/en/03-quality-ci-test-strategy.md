@@ -2,8 +2,6 @@
 title: "Quality, CI, and Test Strategy"
 ---
 
-# Quality, CI, and Test Strategy
-
 ## Quality Bar
 
 This project must be treated as infrastructure. The agent will touch user files, execute commands, and connect to external tools. A broken abstraction is not just ugly; it can become unsafe.

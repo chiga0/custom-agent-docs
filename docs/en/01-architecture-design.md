@@ -2,8 +2,6 @@
 title: "Architecture Design"
 ---
 
-# Architecture Design
-
 ## Design Goal
 
 Build a local-first AI coding agent whose core can be reused by Web, CLI, TUI, IDE, ACP, and channel clients.

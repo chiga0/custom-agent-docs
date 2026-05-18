@@ -2,8 +2,6 @@
 title: "架构设计"
 ---
 
-# 架构设计
-
 ## 设计目标
 
 构建一个 local-first AI coding agent。核心能力沉在可复用 agent core 中，Web、CLI、TUI、IDE、ACP、channel client 都只是 adapter。

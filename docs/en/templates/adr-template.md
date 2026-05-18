@@ -2,8 +2,6 @@
 title: "ADR NNNN: Title"
 ---
 
-# ADR NNNN: Title
-
 Status: Proposed | Accepted | Rejected | Superseded
 
 Date: YYYY-MM-DD

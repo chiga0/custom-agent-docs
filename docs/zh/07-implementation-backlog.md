@@ -2,8 +2,6 @@
 title: "实施 Backlog"
 ---
 
-# 实施 Backlog
-
 这份 backlog 把 roadmap 转成 issue/PR 粒度。除非实现非常小，否则每个条目都应该对应一个 PR。
 
 ## 每项通用完成标准

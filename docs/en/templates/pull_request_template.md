@@ -2,8 +2,6 @@
 title: "Pull Request"
 ---
 
-# Pull Request
-
 ## Roadmap / ADR
 
 - Roadmap item:

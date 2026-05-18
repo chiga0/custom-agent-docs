@@ -2,8 +2,6 @@
 title: "Scheduled Automations / Background Jobs"
 ---
 
-# Scheduled Automations / Background Jobs
-
 > 拆自 `handbook/layers/future-capabilities.md`。本章讲 **MVP 不做** 的定时任务 / 后台任务能力——但 MVP 必须把"任务"建模为 session，避免后期另起一套隐藏任务系统。也兼带提一下产品级 multi-agent 编排（同一根 session 模型下的扩展）。
 
 ---

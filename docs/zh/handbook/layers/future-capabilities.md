@@ -2,8 +2,6 @@
 title: "Remote、Plugin、Automation 预留"
 ---
 
-# Remote、Plugin、Automation 预留
-
 > ⚠️ **本章节已被拆分并重写到 `handbook/advanced/`**（Phase 4 P1）：
 >
 > - [`advanced/remote-execution.md`](../advanced/remote-execution.md) — Remote execution + Mobile remote-control

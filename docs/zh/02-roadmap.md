@@ -2,8 +2,6 @@
 title: "可执行路线图"
 ---
 
-# 可执行路线图
-
 路线图以“可测试增量”为单位推进。每个 milestone 结束时都必须有可运行 Web 回归面，而不是只交付 library code。
 
 当前执行状态、Work ID、活跃 PR 和并行冲突域以 [Roadmap 状态中心](03-roadmap-status.md) 为准。

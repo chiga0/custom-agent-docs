@@ -2,8 +2,6 @@
 title: "Implementation Backlog"
 ---
 
-# Implementation Backlog
-
 This backlog converts the roadmap into issue-sized work. Each item should become one PR unless the implementation proves smaller.
 
 ## Definition of Done for Every Item

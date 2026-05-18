@@ -2,8 +2,6 @@
 title: "MCP（Model Context Protocol）集成"
 ---
 
-# MCP（Model Context Protocol）集成
-
 > 重写自 `handbook/layers/mcp.md`（A2 audit 评分 2/5）。原版只列了 checklist，没解释"MCP 跟 local tool / skill 的区别"，新手读完不知该用 MCP 做什么。本版以"MCP 是什么 + 一次 MCP tool 调用的完整事件链 + stdio vs Streamable HTTP transport"为骨架。
 
 ---

@@ -2,8 +2,6 @@
 title: "ADR 0001: Core Boundary and Event-Sourced Architecture"
 ---
 
-# ADR 0001: Core Boundary and Event-Sourced Architecture
-
 Status: Accepted
 
 Date: 2026-05-17

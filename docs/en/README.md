@@ -2,8 +2,6 @@
 title: "English Docs"
 ---
 
-# English Docs
-
 English documentation is kept under this directory.
 
 The current English documents were produced during the initial project planning pass. The canonical working documentation is now maintained in [Chinese](../zh/README.md) first, then English can be synchronized later.

@@ -2,8 +2,6 @@
 title: "ADR 0005: docs 仓库升级为公开文档站（Astro Starlight + Cloudflare Pages）"
 ---
 
-# ADR 0005: docs 仓库升级为公开文档站（Astro Starlight + Cloudflare Pages）
-
 状态：Accepted
 
 日期：2026-05-18

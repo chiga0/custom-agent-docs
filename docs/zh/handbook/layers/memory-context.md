@@ -2,8 +2,6 @@
 title: "Memory 与 Context 层"
 ---
 
-# Memory 与 Context 层
-
 ## 真实作用
 
 Context 决定模型当前能看到什么。Memory 决定模型跨 session 能记住什么。

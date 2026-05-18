@@ -2,8 +2,6 @@
 title: "Plugin / Extension System"
 ---
 
-# Plugin / Extension System
-
 > 拆自 `handbook/layers/future-capabilities.md`。本章讲 **MVP 不做** 的插件系统，但 MVP 架构必须为未来的 plugin marketplace 留出位置而不破坏现有安全 / 边界约束。
 
 ---

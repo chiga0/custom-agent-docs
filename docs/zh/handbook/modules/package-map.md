@@ -2,8 +2,6 @@
 title: "Package Map"
 ---
 
-# Package Map
-
 本文解释当前实现仓库 `custom-agent` 中每个 package 应承担什么职责，以及未来扩展时应如何拆分。
 
 ## 当前包

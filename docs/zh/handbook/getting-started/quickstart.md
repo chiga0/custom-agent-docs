@@ -2,8 +2,6 @@
 title: "Quickstart：15 分钟跑出第一个 Turn"
 ---
 
-# Quickstart：15 分钟跑出第一个 Turn
-
 读完 [INTRO.md](../INTRO.md) 后，按本指南动手验证你已经理解。
 
 预期：clone 仓库 → 装依赖 → 跑测试 → 打开生成的 JSONL 文件 → 改一段代码看 event 流变化。

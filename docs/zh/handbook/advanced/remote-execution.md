@@ -2,8 +2,6 @@
 title: "Remote Execution（远端执行 / Mobile Remote-Control）"
 ---
 
-# Remote Execution（远端执行 / Mobile Remote-Control）
-
 > 拆自 `handbook/layers/future-capabilities.md`。本章讲 **MVP 不做但架构必须预留** 的远端执行能力——把 agent runtime 放在远程主机 / 容器 / 云端，本地客户端（含 mobile）只做"遥控 + 审批 + 观察"。
 
 ---

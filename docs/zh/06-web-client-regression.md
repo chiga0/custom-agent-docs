@@ -2,8 +2,6 @@
 title: "Web Client 回归方案"
 ---
 
-# Web Client 回归方案
-
 ## 目的
 
 Web client 是第一个 client，因为它让 agent 可观察。它要暴露完整 event stream、tool calls、context construction、permissions 和 diffs。

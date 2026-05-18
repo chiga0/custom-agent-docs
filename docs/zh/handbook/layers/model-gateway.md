@@ -2,8 +2,6 @@
 title: "Model Gateway 层"
 ---
 
-# Model Gateway 层
-
 ## 真实作用
 
 Model Gateway 把不同模型供应商的 API 差异隔离起来，让 Agent Core 只看到统一的模型流。

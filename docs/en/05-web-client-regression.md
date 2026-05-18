@@ -2,8 +2,6 @@
 title: "Web Client Regression Plan"
 ---
 
-# Web Client Regression Plan
-
 ## Purpose
 
 The Web client should be the first client because it makes the agent observable. It should expose the exact event stream, tool calls, context construction, permissions, and diffs that other clients may hide.

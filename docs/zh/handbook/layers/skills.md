@@ -2,8 +2,6 @@
 title: "Skill 系统"
 ---
 
-# Skill 系统
-
 > ⚠️ **本章节已被 [`implementation/skills.md`](../implementation/skills.md) 重写并扩充**（Phase 4 P1）。本文件保留为历史快照；新读者请直接读重写版。
 
 ## 真实作用

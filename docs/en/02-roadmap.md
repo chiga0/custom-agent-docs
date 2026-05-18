@@ -2,8 +2,6 @@
 title: "Executable Roadmap"
 ---
 
-# Executable Roadmap
-
 This roadmap is intentionally staged around testable increments. Each milestone should produce a working Web regression surface, not only library code.
 
 ## Milestone 0: Project Spine and Governance

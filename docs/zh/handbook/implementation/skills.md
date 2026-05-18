@@ -2,8 +2,6 @@
 title: "Skills（可复用工作流）"
 ---
 
-# Skills（可复用工作流）
-
 > 重写自 `handbook/layers/skills.md`（A2 audit 评分 2/5）。原版是 checklist，新读者无法判断"skill 跟 tool / MCP / instruction 有什么区别"。本版以"lazy-load 解决什么 + skill 调用完整事件链"为骨架。
 
 ---

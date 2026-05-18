@@ -13,7 +13,6 @@ hero:
       link: https://github.com/chiga0/custom-agent
       icon: external
 ---
-
 ## 这个站点是什么
 
 `custom-agent` 是一个**本地优先（local-first）、事件溯源（event-sourced）** 的 AI coding agent 框架。本站点同时承载两类内容：

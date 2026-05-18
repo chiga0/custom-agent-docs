@@ -10,7 +10,6 @@ hero:
       icon: external
       variant: primary
 ---
-
 ## English documentation is in progress
 
 The Chinese documentation under `/zh/` is canonical. English mirror starts after Phase 3 ([ADR-0005](/zh/adr/0005-docs-site-architecture/)).

@@ -2,8 +2,6 @@
 title: "Session、Event Log 与 Replay"
 ---
 
-# Session、Event Log 与 Replay
-
 ## 真实作用
 
 Session 是用户与 agent 的长期交互容器。Event log 是 session 的事实来源。Replay 是调试、测试、审计和 remote-control 的基础。
