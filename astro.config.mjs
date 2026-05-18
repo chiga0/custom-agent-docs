@@ -5,8 +5,12 @@ import starlight from "@astrojs/starlight";
 // Starlight 站点入口。
 // - 中文 (zh) 是 canonical；English (en) follow。
 // - 内容物理位置：./docs/zh/ 与 ./docs/en/（保留旧路径，避免大规模迁移）。
-//   通过 src/content/config.ts 的 glob loader 读取。
+//   通过 src/content.config.ts 的 glob loader 读取。
 // - 详见 docs/zh/adr/0005-docs-site-architecture.md。
+//
+// ⚠️ sidebar link 必须是 **相对 locale 的 path**（不带 /zh/ 或 /en/ 前缀）：
+//    Starlight i18n 渲染时会自动按当前 locale 加前缀。如果在 link 里写
+//    /zh/...，会被重复加一层变成 /zh/zh/... 全部 404。
 
 export default defineConfig({
   site: "https://docs.custom-agent.dev", // TODO: 替换为实际部署域名
@@ -27,38 +31,38 @@ export default defineConfig({
           label: "新读者从这里",
           translations: { en: "Start Here" },
           items: [
-            { label: "5 分钟读懂", translations: { en: "5-min Mental Model" }, link: "/zh/handbook/intro/" },
-            { label: "术语表", translations: { en: "Glossary" }, link: "/zh/handbook/glossary/" },
-            { label: "Quickstart", link: "/zh/handbook/getting-started/quickstart/" },
+            { label: "5 分钟读懂", translations: { en: "5-min Mental Model" }, link: "/handbook/intro/" },
+            { label: "术语表", translations: { en: "Glossary" }, link: "/handbook/glossary/" },
+            { label: "Quickstart", link: "/handbook/getting-started/quickstart/" },
           ],
         },
         {
           label: "Foundations",
           translations: { en: "Foundations" },
           items: [
-            { label: "分层架构", translations: { en: "Layered Architecture" }, link: "/zh/handbook/layered-architecture/" },
-            { label: "Turn 生命周期", translations: { en: "Turn Lifecycle" }, link: "/zh/handbook/foundations/turn-lifecycle/" },
+            { label: "分层架构", translations: { en: "Layered Architecture" }, link: "/handbook/layered-architecture/" },
+            { label: "Turn 生命周期", translations: { en: "Turn Lifecycle" }, link: "/handbook/foundations/turn-lifecycle/" },
           ],
         },
         {
           label: "Implementation",
           translations: { en: "Implementation" },
           items: [
-            { label: "从零构建", translations: { en: "From Zero" }, link: "/zh/handbook/implementation/from-zero/" },
-            { label: "Tools 与 Permissions", translations: { en: "Tools & Permissions" }, link: "/zh/handbook/implementation/tools-and-permissions/" },
-            { label: "Context", link: "/zh/handbook/implementation/context/" },
-            { label: "Memory", link: "/zh/handbook/implementation/memory/" },
-            { label: "Skills", link: "/zh/handbook/implementation/skills/" },
-            { label: "MCP", link: "/zh/handbook/implementation/mcp/" },
+            { label: "从零构建", translations: { en: "From Zero" }, link: "/handbook/implementation/from-zero/" },
+            { label: "Tools 与 Permissions", translations: { en: "Tools & Permissions" }, link: "/handbook/implementation/tools-and-permissions/" },
+            { label: "Context", link: "/handbook/implementation/context/" },
+            { label: "Memory", link: "/handbook/implementation/memory/" },
+            { label: "Skills", link: "/handbook/implementation/skills/" },
+            { label: "MCP", link: "/handbook/implementation/mcp/" },
           ],
         },
         {
           label: "Advanced（预留能力）",
           translations: { en: "Advanced (reserved capabilities)" },
           items: [
-            { label: "Remote Execution", link: "/zh/handbook/advanced/remote-execution/" },
-            { label: "Plugin / Extension", link: "/zh/handbook/advanced/plugin-system/" },
-            { label: "Scheduled Automations", link: "/zh/handbook/advanced/automation/" },
+            { label: "Remote Execution", link: "/handbook/advanced/remote-execution/" },
+            { label: "Plugin / Extension", link: "/handbook/advanced/plugin-system/" },
+            { label: "Scheduled Automations", link: "/handbook/advanced/automation/" },
           ],
         },
         {
@@ -71,17 +75,17 @@ export default defineConfig({
           label: "Reference",
           translations: { en: "Reference" },
           items: [
-            { label: "ADR 索引", translations: { en: "ADR Index" }, link: "/zh/handbook/reference/adr-index/" },
+            { label: "ADR 索引", translations: { en: "ADR Index" }, link: "/handbook/reference/adr-index/" },
           ],
         },
         {
           label: "Governance",
           translations: { en: "Governance" },
           items: [
-            { label: "Roadmap", link: "/zh/02-roadmap/" },
-            { label: "Roadmap Status", link: "/zh/03-roadmap-status/" },
-            { label: "Implementation Backlog", link: "/zh/07-implementation-backlog/" },
-            { label: "Quality & CI", link: "/zh/04-quality-ci-test-strategy/" },
+            { label: "Roadmap", link: "/02-roadmap/" },
+            { label: "Roadmap Status", link: "/03-roadmap-status/" },
+            { label: "Implementation Backlog", link: "/07-implementation-backlog/" },
+            { label: "Quality & CI", link: "/04-quality-ci-test-strategy/" },
           ],
         },
         {
