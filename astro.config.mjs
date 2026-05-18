@@ -14,6 +14,8 @@ import starlight from "@astrojs/starlight";
 
 export default defineConfig({
   site: "https://docs.custom-agent.dev", // TODO: 替换为实际部署域名
+  // i18n 站点根路径自身没内容；把 / 重定向到默认 locale 入口。
+  redirects: { "/": "/zh/" },
   integrations: [
     starlight({
       title: "Custom Agent",
