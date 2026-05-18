@@ -48,6 +48,17 @@ export default defineConfig({
             { label: "Tools 与 Permissions", translations: { en: "Tools & Permissions" }, link: "/zh/handbook/implementation/tools-and-permissions/" },
             { label: "Context", link: "/zh/handbook/implementation/context/" },
             { label: "Memory", link: "/zh/handbook/implementation/memory/" },
+            { label: "Skills", link: "/zh/handbook/implementation/skills/" },
+            { label: "MCP", link: "/zh/handbook/implementation/mcp/" },
+          ],
+        },
+        {
+          label: "Advanced（预留能力）",
+          translations: { en: "Advanced (reserved capabilities)" },
+          items: [
+            { label: "Remote Execution", link: "/zh/handbook/advanced/remote-execution/" },
+            { label: "Plugin / Extension", link: "/zh/handbook/advanced/plugin-system/" },
+            { label: "Scheduled Automations", link: "/zh/handbook/advanced/automation/" },
           ],
         },
         {

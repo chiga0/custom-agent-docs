@@ -4,6 +4,14 @@ title: "Remote、Plugin、Automation 预留"
 
 # Remote、Plugin、Automation 预留
 
+> ⚠️ **本章节已被拆分并重写到 `handbook/advanced/`**（Phase 4 P1）：
+>
+> - [`advanced/remote-execution.md`](../advanced/remote-execution.md) — Remote execution + Mobile remote-control
+> - [`advanced/plugin-system.md`](../advanced/plugin-system.md) — Plugin / Extension system
+> - [`advanced/automation.md`](../advanced/automation.md) — Scheduled automations + product-level multi-agent
+>
+> 本文件保留为历史快照；新读者请直接读拆分版。
+
 ## 为什么现在就要想未来能力
 
 Remote-control、插件系统、移动端、定时任务、多 agent 不是 MVP 主实现，但如果 MVP 架构没有预留，将来会被迫重写 core。

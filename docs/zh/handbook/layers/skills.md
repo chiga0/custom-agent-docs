@@ -4,6 +4,8 @@ title: "Skill 系统"
 
 # Skill 系统
 
+> ⚠️ **本章节已被 [`implementation/skills.md`](../implementation/skills.md) 重写并扩充**（Phase 4 P1）。本文件保留为历史快照；新读者请直接读重写版。
+
 ## 真实作用
 
 Skill 是可复用工作流。它把某类任务的步骤、约束、工具使用方式、领域知识打包起来，让 agent 在需要时加载。

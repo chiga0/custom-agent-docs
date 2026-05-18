@@ -214,6 +214,7 @@ PR 关闭或放弃后：
 | 2026-05-18 | M9 拆 9a / 9b / 9c      | 原 M9 体量过大（sandbox + redaction + packaging + regression 全混在一起）；按风险类型拆为 Security / Production Ops / QA & Regression；observability / config / security baseline 提前到 M1-M3 同步埋点 | 详见 02-roadmap.md M9 节 |
 | 2026-05-18 | ADR-0005 docs 站升级    | 选定 Astro Starlight + Cloudflare Pages + Pagefind + Vale；目录分 getting-started / foundations / implementation / reference / governance / advanced / adr 七大类；CI 加 docs-ref-check 守护 handbook ↔ 代码一致性 | 分 4 phase 实施；本轮完成 Phase 1（决策 + 关键新章节） |
 | 2026-05-18 | docs Phase 2 + Phase 4 P0 | Phase 2: Astro Starlight 项目脚手架（package.json / astro.config.mjs / src/content.config.ts / docs/zh/index.md splash / docs-build.yaml / docs-link-check.yaml / SITE-SETUP.md）；Phase 4 P0: 重写 3 个弱章节（implementation/tools-and-permissions.md / context.md + memory.md 拆分 / from-zero.md 含 checkpoint 代码） | maintainer 需在 Cloudflare 控制台一次性绑定项目（见 SITE-SETUP.md）；Phase 3 内容物理迁移待 M1 完结 |
+| 2026-05-18 | docs Phase 4 P1 完成 | 重写 A2 audit 2/5 评分的剩余 5 个章节：implementation/skills.md（lazy-loading 问题方案对比图 + allowed_tools 与 PermissionEngine 协作 + 事件链） / implementation/mcp.md（server 生命周期 + tool/resource/prompt 三类对比 + 完整事件链） / advanced/remote-execution.md（mobile 定位 + auth scope 分级） / advanced/plugin-system.md（manifest schema + 与 MCP 边界）/ advanced/automation.md（trigger 模型 + 自动化权限 timeout）；旧 layers/{skills,mcp,future-capabilities}.md 加 stale notice 指向重写版。本地 build 验证 99 pages（+10）/ 15487 词（+2211）/ 1.86s | Phase 4 P2 剩 4 章（core-layer / model-gateway / storage-and-replay / client-adapters）；Phase 3 仍待 M1 完结 |
 
 ## 13. 更新检查清单
 

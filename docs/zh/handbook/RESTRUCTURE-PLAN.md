@@ -13,8 +13,9 @@ title: "Handbook 重构与文档站施工计划"
 | Phase 1 决策 + 新章节 | ✅ 上一轮完成 |
 | Phase 2 站点脚手架 | ✅ 本轮完成（待 maintainer 绑 Cloudflare） |
 | Phase 3 内容物理迁移 + drift CI | 待 M1 完结后 |
-| Phase 4 P0 重写（3 章） | ✅ 本轮完成（tools-and-permissions / context / memory / from-zero） |
-| Phase 4 P1-P2 重写（7 章） | 待下一轮 |
+| Phase 4 P0 重写（3 章） | ✅ 上一轮完成（tools-and-permissions / context / memory / from-zero） |
+| Phase 4 P1 重写（5 章） | ✅ 本轮完成（skills / mcp / advanced/{remote-execution, plugin-system, automation}） |
+| Phase 4 P2 重写（4 章） | 待下一轮（core-layer / model-gateway / storage-and-replay / client-adapters） |
 | Phase 5 多版本 + 英文 mirror | 待 v1 release |
 
 ## Phase 1 — 决策落档 + 关键新章节（已完成）
