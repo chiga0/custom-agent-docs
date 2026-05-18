@@ -67,7 +67,9 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
-| M1-ACP-STDIO | `REVIEW` | Claude | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) | `apps/acp-server`：基于 @agentclientprotocol/sdk 的 Zed ACP stdio | `core-session` / `apps-acp` | Round 1 FAIL 已修复（4 P1 全部）；force-pushed `b573498`；draft → ready；CI 全绿；等 Codex Round 2 |
+| M1-ACP-STDIO | `REVIEW` | Claude Opus 4.7 | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) | `apps/acp-server`：基于 @agentclientprotocol/sdk 的 Zed ACP stdio | `core-session` / `apps-acp` | Round 2 已修（resource_link + subpath）；force-pushed `edbd5f6`；CI 全绿；等 Codex Round 3 |
+| M1-ACP-HTTP | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-acp-http`（基于 m1-acp-stdio，未 merge → draft PR） | `apps/acp-daemon`：HTTP+SSE 网关 + Streamable HTTP transport spec + 1:1 子进程 + bearer auth + 多 session 测试 | `apps-acp` | 实现 → 本地 quality gate → 开 draft PR；PR #5 merge 后 rebase main + ready |
+| M1-QA-01 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-qa-01-golden-fixtures` | golden transcript fixtures + normalized projection + replay/live equivalence test | `ci-quality` | 实现 → 本地 quality gate → 开 PR |
 
 ## 6. 推荐并行切分
 
@@ -101,9 +103,9 @@ title: "Roadmap 状态中心"
 | M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
 | M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
 | M1-ACP-STDIO | ACP stdio server         | `REVIEW` | M1-01, M1-03       | core agent         | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) — protocol / framing / mapper / server / 21 新单测；详见 [[adr-0004]] |
-| M1-ACP-HTTP | ACP Streamable HTTP daemon | `TODO` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec |
+| M1-ACP-HTTP | ACP Streamable HTTP daemon | `IN_PROGRESS` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec（基于 m1-acp-stdio，draft until #5 merge） |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
-| M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
+| M1-QA-01  | Golden Transcript Fixtures | `IN_PROGRESS` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
 
 ## 8. 未开始队列
 
