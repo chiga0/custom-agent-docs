@@ -67,8 +67,7 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
-| M1-ACP-STDIO | `REVIEW` | Claude Opus 4.7 | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) | `apps/acp-server`：基于 @agentclientprotocol/sdk 的 Zed ACP stdio | `core-session` / `apps-acp` | Round 2 已修（resource_link + subpath）；force-pushed `edbd5f6`；CI 全绿；等 Codex Round 3 |
-| M1-ACP-HTTP | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-acp-http`（基于 m1-acp-stdio，未 merge → draft PR） | `apps/acp-daemon`：HTTP+SSE 网关 + Streamable HTTP transport spec + 1:1 子进程 + bearer auth + 多 session 测试 | `apps-acp` | 实现 → 本地 quality gate → 开 draft PR；PR #5 merge 后 rebase main + ready |
+| M1-ACP-HTTP | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-acp-http` | `apps/acp-daemon`：HTTP+SSE 网关 + Streamable HTTP transport spec + 1:1 子进程 + bearer auth + 多 session 测试 | `apps-acp` | PR #5 已 merge；rebase main → 本地 quality gate → ready review |
 | M1-QA-01 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-qa-01-golden-fixtures` | golden transcript fixtures + normalized projection + replay/live equivalence test | `ci-quality` | 实现 → 本地 quality gate → 开 PR |
 
 ## 6. 推荐并行切分
@@ -102,8 +101,8 @@ title: "Roadmap 状态中心"
 | M1-02     | Session Index              | `DONE`  | M1-01              | storage agent      | merged to main (`aadeb8b`) — SQLite session/turn index + JSONL rebuild |
 | M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
 | M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
-| M1-ACP-STDIO | ACP stdio server         | `REVIEW` | M1-01, M1-03       | core agent         | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) — protocol / framing / mapper / server / 21 新单测；详见 [[adr-0004]] |
-| M1-ACP-HTTP | ACP Streamable HTTP daemon | `IN_PROGRESS` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec（基于 m1-acp-stdio，draft until #5 merge） |
+| M1-ACP-STDIO | ACP stdio server         | `DONE` | M1-01, M1-03       | core agent         | merged to main (`d005879`) — official Zed ACP SDK stdio server + schema subpath + 69 tests |
+| M1-ACP-HTTP | ACP Streamable HTTP daemon | `IN_PROGRESS` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec；PR #5 已 merge，需 rebase main |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
 | M1-QA-01  | Golden Transcript Fixtures | `IN_PROGRESS` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
 
@@ -215,6 +214,7 @@ PR 关闭或放弃后：
 | 2026-05-18 | ADR-0005 docs 站升级    | 选定 Astro Starlight + Cloudflare Pages + Pagefind + Vale；目录分 getting-started / foundations / implementation / reference / governance / advanced / adr 七大类；CI 加 docs-ref-check 守护 handbook ↔ 代码一致性 | 分 4 phase 实施；本轮完成 Phase 1（决策 + 关键新章节） |
 | 2026-05-18 | docs Phase 2 + Phase 4 P0 | Phase 2: Astro Starlight 项目脚手架（package.json / astro.config.mjs / src/content.config.ts / docs/zh/index.md splash / docs-build.yaml / docs-link-check.yaml / SITE-SETUP.md）；Phase 4 P0: 重写 3 个弱章节（implementation/tools-and-permissions.md / context.md + memory.md 拆分 / from-zero.md 含 checkpoint 代码） | maintainer 需在 Cloudflare 控制台一次性绑定项目（见 SITE-SETUP.md）；Phase 3 内容物理迁移待 M1 完结 |
 | 2026-05-18 | docs Phase 4 P1 完成 | 重写 A2 audit 2/5 评分的剩余 5 个章节：implementation/skills.md（lazy-loading 问题方案对比图 + allowed_tools 与 PermissionEngine 协作 + 事件链） / implementation/mcp.md（server 生命周期 + tool/resource/prompt 三类对比 + 完整事件链） / advanced/remote-execution.md（mobile 定位 + auth scope 分级） / advanced/plugin-system.md（manifest schema + 与 MCP 边界）/ advanced/automation.md（trigger 模型 + 自动化权限 timeout）；旧 layers/{skills,mcp,future-capabilities}.md 加 stale notice 指向重写版。本地 build 验证 99 pages（+10）/ 15487 词（+2211）/ 1.86s | Phase 4 P2 剩 4 章（core-layer / model-gateway / storage-and-replay / client-adapters）；Phase 3 仍待 M1 完结 |
+| 2026-05-18 | M1-ACP-STDIO 合入 main | PR #5 通过 Codex Round 3 mainline-guardian PASS；merge SHA `d005879` | ACP stdio canonical wire 完成；M1-ACP-HTTP 可 rebase main 并推进 ready review |
 
 ## 13. 更新检查清单
 
