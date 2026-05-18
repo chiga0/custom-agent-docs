@@ -67,7 +67,7 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
-| M1-ACP-STDIO | `REVIEW` | Claude | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) | `apps/acp-server`：Zed ACP JSON-RPC over stdio 最小子集 | `core-session` / `apps-acp` | draft 已开；等 reviewer agent 跑 mainline-guardian |
+| M1-ACP-STDIO | `REVIEW` | Claude | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) | `apps/acp-server`：基于 @agentclientprotocol/sdk 的 Zed ACP stdio | `core-session` / `apps-acp` | Round 1 FAIL 已修复（4 P1 全部）；force-pushed `b573498`；draft → ready；CI 全绿；等 Codex Round 2 |
 
 ## 6. 推荐并行切分
 
