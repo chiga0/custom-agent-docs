@@ -2,6 +2,17 @@
 
 > 本文档配套 [[adr-0005]]。Phase 1 已由 2026-05-18 audit commit 完成；Phase 2-4 待下一轮工作循环逐步落地。
 
+## 当前执行状态总览
+
+| Phase | 本轮状态 |
+|---|---|
+| Phase 1 决策 + 新章节 | ✅ 上一轮完成 |
+| Phase 2 站点脚手架 | ✅ 本轮完成（待 maintainer 绑 Cloudflare） |
+| Phase 3 内容物理迁移 + drift CI | 待 M1 完结后 |
+| Phase 4 P0 重写（3 章） | ✅ 本轮完成（tools-and-permissions / context / memory / from-zero） |
+| Phase 4 P1-P2 重写（7 章） | 待下一轮 |
+| Phase 5 多版本 + 英文 mirror | 待 v1 release |
+
 ## Phase 1 — 决策落档 + 关键新章节（已完成）
 
 ✅ 写完并 push 到 main：
@@ -15,18 +26,30 @@
 - `02-roadmap.md` M9 拆 9a / 9b / 9c；M8 改名 "ACP Production Hardening"
 - `03-roadmap-status.md` 加 M1-ACP-STDIO / M1-ACP-HTTP；M9 拆分；decision log 加 4 条
 
-## Phase 2 — 站点框架就位（建议下一工作循环）
+## Phase 2 — 站点框架就位（✅ 本轮完成）
 
-任务：
+### 已经 push 的内容
 
-1. `npm init` + Astro Starlight 项目初始化在 docs 仓库根。
-2. `astro.config.mjs` 配置：i18n（zh + en）、Pagefind 搜索、sidebar 自动生成。
-3. 创建 `src/content/docs/zh/` 目录骨架（7 个顶级类目，先做 redirect / symlink，**不物理迁移**原文件）。
-4. GitHub Actions：`docs-build.yaml`（每 PR 跑 `astro build`，失败阻断）。
-5. Cloudflare Pages 项目绑定 GitHub repo；先 staging 域名。
-6. 写中文首页 `src/content/docs/zh/index.md`（顶层 hero + 五大入口链接）。
+- `package.json` + `astro.config.mjs` + `tsconfig.json` + `src/content.config.ts` 完整 Starlight 项目骨架。
+- `src/content.config.ts` 用 `glob({ pattern: '**/*.{md,mdx}', base: './docs' })` loader 读现有 `docs/zh/` + `docs/en/`，**不物理迁移**任何 markdown。
+- `.gitignore` / `.markdownlint.json` / 默认 prettier 不需要（站点不强制 prose linter 这一 phase）。
+- `.github/workflows/docs-build.yaml` — npm ci → markdownlint → astro check → astro build；PR 阻断。
+- `.github/workflows/docs-link-check.yaml` — 每周一 cron + 手动触发；外链坏链开 issue 但不阻 PR。
+- `docs/zh/index.md` Splash 首页 + `docs/en/index.md` English 占位。
+- `SITE-SETUP.md` 给 maintainer 的部署 + Cloudflare Pages 绑定步骤。
 
-验收：PR 自动 preview 链接生效；staging URL 可访问；构建时间 < 30s。
+### 待 maintainer 一次性人工操作（不能自动化）
+
+1. 在 Cloudflare Pages 控制台创建项目，绑定 GitHub repo（见 `SITE-SETUP.md`）。
+2. 选定 prod 域名后，把 `astro.config.mjs` 的 `site:` 字段同步过去。
+3. 验证 PR auto-preview 工作。
+
+### 待原 Phase 2 计划但本轮没做（推到下一轮）
+
+- Pagefind 搜索集成（Starlight 0.30+ 默认含有，但需要 verify build 后 `/_pagefind/` 资源生成）。
+- 中文 → 英文导航切换 UI 字符串确认（Starlight 内置 i18n，但需要 build 后看视觉效果）。
+- Cloudflare Pages 域名 + 自定义域名 + HTTPS 证书。
+- 构建时间 benchmark（目标 < 30s）。
 
 ## Phase 3 — 内容物理迁移 + drift CI（M1 完结后）
 
@@ -42,15 +65,19 @@
 
 验收：handbook 全部在 site 上正确渲染；ref-check CI 在 PR 上守护；prod 域名访问正常。
 
-## Phase 4 — 大规模内容重写（M1 完结后，与 Phase 3 并行）
+## Phase 4 — 大规模内容重写（与 Phase 3 并行）
 
-按 A2 audit 评分（1-5 分），优先重写得分 ≤ 2 的章节。建议顺序：
+按 A2 audit 评分（1-5 分），优先重写得分 ≤ 2 的章节。
 
-| 优先级 | 章节 | 当前评分 | 重写目标 |
-|---|---|---|---|
-| P0 | `implementation/tools-and-permissions.md`（重写自 `layers/tool-permission.md`）| 2/5 | 加权限决策树 visual + 一个 user 请求 shell 的完整事件链 worked example + 风险分类的 rationale |
-| P0 | `implementation/context-and-memory.md`（拆自 `layers/memory-context.md`）| 2/5 | 拆成 Part A: ContextBuilder（model 看到什么）+ Part B: Memory（跨 turn 记什么）；两套独立例子 |
-| P0 | `implementation/from-zero.md`（重写自 `tutorials/build-agent-from-zero.md`）| 4/5 但缺代码 | 每个 Step 加可跑代码 + failing test → passing test 的 checkpoint；指向 `/packages/` 实际文件 |
+### ✅ P0 已完成（本轮）
+
+| 章节 | 当前评分 | 落地 |
+|---|---|---|
+| `implementation/tools-and-permissions.md`（重写自 `layers/tool-permission.md`，2/5） | ✅ | 加权限决策树 + 完整事件链 worked example + 风险分类 rationale + 6 类常见误区 + prompt injection 防御 |
+| `implementation/context.md` + `implementation/memory.md`（拆自 `layers/memory-context.md`，2/5） | ✅ | 拆成两章：context（per-turn 拼装）+ memory（跨-turn 持久化 + candidate workflow）；各自独立的测试策略、误区表 |
+| `implementation/from-zero.md`（重写自 `tutorials/build-agent-from-zero.md`，4/5 但缺代码）| ✅ | 11 个 Step 含 TypeScript 片段 + checkpoint 测试代码 + 指向 `custom-agent` 实际文件的 deep link |
+
+### 待重写（按 P1 / P2 优先级，下一轮逐步推进）
 | P1 | `implementation/skills.md`（重写自 `layers/skills.md`）| 2/5 | 加 lazy loading 的"问题→方案"对比 diagram；说明 allowed_tools enforcement |
 | P1 | `implementation/mcp.md`（重写自 `layers/mcp.md`）| 2/5 | 加 MCP 新手 overview；加一个 MCP tool 调用通过 PermissionEngine 的完整事件链 |
 | P1 | `advanced/` 三章（拆自 `layers/future-capabilities.md`）| 2/5 | 拆成 remote-execution / plugin-system / automation 三个独立页；每页讲清楚"为什么延后 + 延后期间架构如何预留" |

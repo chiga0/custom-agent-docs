@@ -209,6 +209,7 @@ PR 关闭或放弃后：
 | 2026-05-18 | ADR-0004 ACP 统一 wire | 取消 web / cli / acp 各自一套 wire；ACP 唯一协议 + stdio / Streamable HTTP 双 transport；1 session = 1 acp-server 子进程；TUI 也走 HTTP | ADR-0003 §T1 / §T4 作废；新增 M1-ACP-STDIO / M1-ACP-HTTP work item；M8 改名 "ACP Production Hardening"；M1-04 改为 ACP HTTP session/load 子集 |
 | 2026-05-18 | M9 拆 9a / 9b / 9c      | 原 M9 体量过大（sandbox + redaction + packaging + regression 全混在一起）；按风险类型拆为 Security / Production Ops / QA & Regression；observability / config / security baseline 提前到 M1-M3 同步埋点 | 详见 02-roadmap.md M9 节 |
 | 2026-05-18 | ADR-0005 docs 站升级    | 选定 Astro Starlight + Cloudflare Pages + Pagefind + Vale；目录分 getting-started / foundations / implementation / reference / governance / advanced / adr 七大类；CI 加 docs-ref-check 守护 handbook ↔ 代码一致性 | 分 4 phase 实施；本轮完成 Phase 1（决策 + 关键新章节） |
+| 2026-05-18 | docs Phase 2 + Phase 4 P0 | Phase 2: Astro Starlight 项目脚手架（package.json / astro.config.mjs / src/content.config.ts / docs/zh/index.md splash / docs-build.yaml / docs-link-check.yaml / SITE-SETUP.md）；Phase 4 P0: 重写 3 个弱章节（implementation/tools-and-permissions.md / context.md + memory.md 拆分 / from-zero.md 含 checkpoint 代码） | maintainer 需在 Cloudflare 控制台一次性绑定项目（见 SITE-SETUP.md）；Phase 3 内容物理迁移待 M1 完结 |
 
 ## 13. 更新检查清单
 

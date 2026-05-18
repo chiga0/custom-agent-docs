@@ -1,2 +1,23 @@
-.DS_Store
+# Astro / build outputs
+.astro/
+dist/
+.pagefind/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Logs
 *.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
