@@ -65,9 +65,9 @@ title: "Roadmap 状态中心"
 
 ## 5. 当前活跃工作
 
-| Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
-| ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-| 暂无 | `-` | - | - | - | - | M1-02 / M1-03 已合入；下一步推荐认领 M1-04 Replay API |
+| Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
+| ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
+| M1-ACP-STDIO | `REVIEW` | Claude | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) | `apps/acp-server`：Zed ACP JSON-RPC over stdio 最小子集 | `core-session` / `apps-acp` | draft 已开；等 reviewer agent 跑 mainline-guardian |
 
 ## 6. 推荐并行切分
 
@@ -100,7 +100,7 @@ title: "Roadmap 状态中心"
 | M1-02     | Session Index              | `DONE`  | M1-01              | storage agent      | merged to main (`aadeb8b`) — SQLite session/turn index + JSONL rebuild |
 | M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
 | M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
-| M1-ACP-STDIO | ACP stdio server         | `READY` | M1-01, M1-03       | core agent         | `apps/acp-server`：Zed ACP JSON-RPC over stdio 最小子集；详见 [[adr-0004]] |
+| M1-ACP-STDIO | ACP stdio server         | `REVIEW` | M1-01, M1-03       | core agent         | [custom-agent#5](https://github.com/chiga0/custom-agent/pull/5) — protocol / framing / mapper / server / 21 新单测；详见 [[adr-0004]] |
 | M1-ACP-HTTP | ACP Streamable HTTP daemon | `TODO` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
 | M1-QA-01  | Golden Transcript Fixtures | `READY` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
