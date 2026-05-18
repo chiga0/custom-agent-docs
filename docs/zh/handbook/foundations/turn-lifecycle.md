@@ -8,7 +8,7 @@ title: "一个 Turn 的完整生命周期"
 
 ## 1. Turn 状态机
 
-```
+```text
         ┌──────────┐
         │   idle   │  (创建 Turn 时进入)
         └─────┬────┘
@@ -37,7 +37,7 @@ completed  cancelled   failed
 
 输入：用户说 `"hello"`，FakeStreamingProvider 配置 chunks = `["hi", " there"]`。
 
-```
+```text
 sequence  type              payload
 ────────  ────────────────  ─────────────────────────────
 1         session.created   {cwd:"/tmp", client:"test"}
@@ -58,7 +58,7 @@ sequence  type              payload
 
 ⚠️ 下面是 **M3 完成后**的预期事件链。M1-M2 阶段不会出现 tool 相关事件。
 
-```
+```text
 sequence  type                            payload (摘要)
 ────────  ──────────────────────────────  ──────────────────────────────────
 N         turn.started                    {promptPreview:"重命名 src/foo.ts ..."}
@@ -97,7 +97,7 @@ N+17      turn.completed                  {stopReason:"final"}
 
 两条路径汇入同一个 controller：
 
-```
+```text
                 ┌─────────────────┐
                 │ AbortSignal     │
                 │ (external)      │
@@ -149,7 +149,7 @@ provider yield `{ type: "failed", reason: "..." }` 或 `stream()` 抛异常：
 
 ## 6. 与 Storage 的关系
 
-```
+```text
 SessionEngine.runTurn()
        │
        ▼  

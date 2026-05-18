@@ -6,7 +6,7 @@ hero:
   tagline: Local-first, event-sourced AI coding agent framework
   actions:
     - text: View on GitHub
-      link: https://github.com/chiga0/custom-agent
+      link: <https://github.com/chiga0/custom-agent>
       icon: external
       variant: primary
 ---

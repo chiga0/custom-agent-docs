@@ -69,7 +69,7 @@ title: "ADR 0005: docs 仓库升级为公开文档站（Astro Starlight + Cloudf
 
 ### 5. 站点目录结构（重要）
 
-```
+```text
 custom-agent-docs/
 ├─ astro.config.mjs              # Starlight 配置入口
 ├─ src/

@@ -56,7 +56,7 @@ ADR-0003 的初版决策保留了三种 wire 形态：
 - **`apps/acp-server`** — core 的 **canonical wire 形态**：单进程，读 stdin、写 stdout，按 Zed ACP 处理 JSON-RPC。一个进程一个 session。editor / IDE / 任何能 spawn 子进程的工具直接挂这个 binary，**不需要我们的 daemon**。
 - **`apps/acp-daemon`** — HTTP+SSE 网关：监听端口、定义 ACP Streamable HTTP transport。每收到 `session/new` 就 spawn 一个 acp-server 子进程，全程做 1:1 复用，crash 隔离。
 
-```
+```text
               ┌─────────────────────┐
               │  packages/core      │
               │  (SessionEngine)    │  in-process TS API

@@ -81,7 +81,7 @@ policy:
 
 加载流程：
 
-```
+```text
 user/admin: "安装这个 plugin"
        │
        ▼

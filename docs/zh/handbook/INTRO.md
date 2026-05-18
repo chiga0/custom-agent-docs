@@ -35,6 +35,7 @@ title: "5 分钟读懂 Agent Framework"
 **做法**：所有有意义的动作（`session.created`、`turn.started`、`user.message`、`model.delta`、`tool.executed`、`permission.resolved`、`turn.completed` ...）都写成 `AgentEvent` 追加到 JSONL 文件。**事件先落盘，才让 client 看到。**
 
 **好处**：
+
 - 客户端只是 event log 的投影 → Web / CLI / replay 看到的内容完全一致。
 - 删掉所有 client 进程，重启后只读 JSONL 就能恢复所有可见状态。
 - 调试 / 审计 / 合规审查直接看 JSONL，不用搭额外的 telemetry。
@@ -46,6 +47,7 @@ title: "5 分钟读懂 Agent Framework"
 **做法**：core 不知道 Web / CLI / IDE 长什么样。**统一通过 Agent Client Protocol（ACP）** 与外部通信。ACP 由 Zed 主导定义；项目在 stdio 之上扩展了 Streamable HTTP transport，但**协议本身不私改**。
 
 **好处**：
+
 - 加一个新 client 只需要写 adapter，不需要 fork core。
 - Zed / 任意 ACP 兼容 editor 可以直接 spawn `apps/acp-server` 接入。
 - 远程化 / mobile 是同一个协议在不同 transport 上跑，不需要造新轮子。
@@ -59,6 +61,7 @@ title: "5 分钟读懂 Agent Framework"
 **做法**：每一次工具调用都生成 `permission.requested` 事件 → PermissionEngine 给出 `allow / deny / ask` → 落 `permission.resolved` → 才允许 `tool.started`。**没有例外**。
 
 **好处**：
+
 - 用户能审计每一次危险动作的批准链路。
 - 加新的工具类型（local / MCP / skill 内嵌）都自动走同一道闸。
 - 出问题时事件链是完整的，能 replay 还原。
@@ -69,7 +72,7 @@ title: "5 分钟读懂 Agent Framework"
 
 只有 model 流式回复，没有工具调用：
 
-```
+```text
 User: "hello"
    │
    ▼

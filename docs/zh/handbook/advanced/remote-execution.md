@@ -27,7 +27,7 @@ local-first 是 M0-M9 的主线，但下面四类场景在 M9 之后基本无法
 
 ## 2. 远端化必须复用的抽象
 
-```
+```text
 locally:                              remotely (M10+):
 ┌──────────────────┐                  ┌──────────────────────────┐
 │ Web client       │                  │ Web client (any device)  │
@@ -118,7 +118,7 @@ remote：approval 可能在用户在地铁里时触发；需要 push 通知 + 30
 
 Mobile 是 **remote client 的特殊形态**——不是新概念。
 
-```
+```text
 Mobile 是什么：               Mobile 不是什么：
 ✓ ACP Streamable HTTP client  ✗ agent runtime
 ✓ replay viewer               ✗ tool executor

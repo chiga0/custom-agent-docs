@@ -10,7 +10,7 @@ hero:
       icon: right-arrow
       variant: primary
     - text: 在 GitHub 上查看
-      link: https://github.com/chiga0/custom-agent
+      link: <https://github.com/chiga0/custom-agent>
       icon: external
 ---
 ## 这个站点是什么

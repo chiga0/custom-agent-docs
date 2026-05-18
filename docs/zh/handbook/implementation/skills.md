@@ -61,7 +61,7 @@ body（**仅在 skill 被命中并加载时才进 context**）：完整的 SOP �
 
 ## 3. Lazy Loading：解决的根本问题
 
-```
+```text
 没有 lazy loading：                    有 lazy loading：
 ┌────────────────────────┐           ┌────────────────────────┐
 │  context              │           │  context              │
@@ -118,7 +118,7 @@ Trigger 决定 ContextBuilder 何时把哪些 skill body 注入 context。有 4 
 
 以 user 输入 `/skill mainline-guardian` 为例。M5 落地后形态。
 
-```
+```text
 seq=N    user.message              {content: "/skill mainline-guardian"}
 seq=N+1  skill.loaded              {
                                      name: "mainline-guardian",
@@ -157,7 +157,7 @@ seq=N+M+1 turn.completed            {stopReason: "final"}
 
 `allowed_tools` 是 **能力声明 + 上限**，不是"自动批准"。
 
-```
+```text
 input: tool=git_diff  →  PermissionEngine 看：
                           - tool.risk: read
                           - skill.allowed_tools 含 git_diff ✓ （否则直接 deny）

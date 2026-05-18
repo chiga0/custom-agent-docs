@@ -28,7 +28,7 @@ MCP（Model Context Protocol）由 Anthropic 主导设计，是 **agent ↔ 外�
 
 ## 2. 架构定位
 
-```
+```text
         ┌─────────────────────────────────┐
         │  packages/core (SessionEngine)  │
         └─────────────┬───────────────────┘
@@ -68,7 +68,7 @@ MCP（Model Context Protocol）由 Anthropic 主导设计，是 **agent ↔ 外�
 
 ## 3. MCP Server 生命周期
 
-```
+```text
                 配置文件 (mcp.config.json)
                        │
                        ▼
@@ -154,7 +154,7 @@ MCP 协议本身（JSON-RPC 消息格式）不变，但 transport 有两种：
 
 不同 MCP server 可能暴露同名 tool（比如多个 server 都有 `read_file`）。命名空间：
 
-```
+```text
 local tools:           read_file, list_files, search_text, shell, apply_patch
 MCP server "fs":       mcp.fs.read_text, mcp.fs.list_dir
 MCP server "jira":     mcp.jira.get_issue, mcp.jira.search
@@ -172,7 +172,7 @@ ToolRouter 的去重 / 路由规则：
 
 User: "查一下 Jira issue PROJ-123 的状态"。M6 + M3 落地后形态。
 
-```
+```text
 seq=N    user.message              {content: "查一下 Jira issue PROJ-123 的状态"}
 seq=N+1  context.built              {tools: [..., "mcp.jira.get_issue", ...]}
 seq=N+2  model.delta                {text: "我查一下..."}
@@ -226,7 +226,7 @@ seq=N+11 turn.completed             {stopReason: "final"}
 
 ## 7. Resources：与 Tools 的关键区别
 
-```
+```text
 Tool         = "agent 可执行的动作"  → 模型主动调用，permission gate
 Resource     = "agent 可读取的资源" → user / policy 显式 include，**不自动加 context**
 Prompt       = "可参数化的模板"     → user / agent slash command 触发
@@ -242,7 +242,7 @@ Prompt       = "可参数化的模板"     → user / agent slash command 触发
 
 资源 include 的事件流：
 
-```
+```text
 seq=N    mcp.resource.requested    {server: "wiki", uri: "wiki://docs/architecture"}
 seq=N+1  permission.requested      {risk: "read", sourcedFrom: "user_explicit_include"}
 seq=N+2  permission.resolved       {decision: "allow"}
@@ -272,7 +272,7 @@ arguments:
 
 事件流：
 
-```
+```text
 seq=N    user.message              {content: "/prompt bugfix_review pr=456 severity=critical"}
 seq=N+1  mcp.prompt.invoked        {server, prompt: "bugfix_review", arguments: {pr_number: 456, severity: "critical"}}
 seq=N+2  mcp.prompt.expanded       {messages: [...]}  ← server 返回 ChatML 列表
@@ -370,4 +370,4 @@ MCP server **默认不可信**——这条原则比"local tool 默认信任"严�
 - [`skills.md`](skills.md) §7 — Skill vs MCP 界线
 - [`context.md`](context.md) §3 — MCP resource 在 token budget 中独立桶
 - [`reference/event-schema.md`](../reference/event-schema.md)（待写）— `mcp.*` event payload schema
-- MCP 官方规范：https://spec.modelcontextprotocol.io/
+- MCP 官方规范：<https://spec.modelcontextprotocol.io/>

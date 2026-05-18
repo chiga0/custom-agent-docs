@@ -21,7 +21,7 @@ title: "Scheduled Automations / Background Jobs"
 
 ## 2. 核心原则：任务也是 session
 
-```
+```text
 不要：                              要：
 ┌────────────────────┐             ┌────────────────────────────┐
 │ Scheduler           │             │ Scheduler                  │
@@ -46,13 +46,13 @@ title: "Scheduled Automations / Background Jobs"
 
 | Trigger | 例子 | 落地位置 |
 |---|---|---|
-| **Schedule** | cron 表达式："0 9 * * *" | daemon 内置 scheduler，存储在 `~/.config/.../schedules.json` |
+| **Schedule** | cron 表达式："0 9 ** *" | daemon 内置 scheduler，存储在 `~/.config/.../schedules.json` |
 | **External event** | webhook（GitHub PR opened）、文件系统变化 | daemon 暴露 webhook endpoint 接收外部触发 |
 | **Session reaction** | "上一个 turn `turn.completed` 后立即跑这个 skill" | event log subscriber pattern |
 
 trigger 触发后：
 
-```
+```text
 trigger fires
    │
    ▼

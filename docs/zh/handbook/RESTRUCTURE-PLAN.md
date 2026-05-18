@@ -81,6 +81,7 @@ title: "Handbook 重构与文档站施工计划"
 | `implementation/from-zero.md`（重写自 `tutorials/build-agent-from-zero.md`，4/5 但缺代码）| ✅ | 11 个 Step 含 TypeScript 片段 + checkpoint 测试代码 + 指向 `custom-agent` 实际文件的 deep link |
 
 ### 待重写（按 P1 / P2 优先级，下一轮逐步推进）
+
 | P1 | `implementation/skills.md`（重写自 `layers/skills.md`）| 2/5 | 加 lazy loading 的"问题→方案"对比 diagram；说明 allowed_tools enforcement |
 | P1 | `implementation/mcp.md`（重写自 `layers/mcp.md`）| 2/5 | 加 MCP 新手 overview；加一个 MCP tool 调用通过 PermissionEngine 的完整事件链 |
 | P1 | `advanced/` 三章（拆自 `layers/future-capabilities.md`）| 2/5 | 拆成 remote-execution / plugin-system / automation 三个独立页；每页讲清楚"为什么延后 + 延后期间架构如何预留" |

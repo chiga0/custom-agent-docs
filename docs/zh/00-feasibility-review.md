@@ -142,11 +142,11 @@ ACP 最小实现：
 
 ## 关键参考
 
-- Claude Code overview and extension model: https://code.claude.com/docs/en/overview
-- Claude memory model: https://code.claude.com/docs/en/memory
-- OpenAI Codex `AGENTS.md`: https://developers.openai.com/codex/guides/agents-md
-- MCP architecture: https://modelcontextprotocol.io/specification/2025-06-18/architecture
-- MCP transports: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports
-- ACP overview: https://agentclientprotocol.com/protocol/overview
-- Gemini CLI repository and docs: https://github.com/google-gemini/gemini-cli
-- Qwen Code memory docs: https://qwenlm.github.io/qwen-code-docs/en/users/features/memory/
+- Claude Code overview and extension model: <https://code.claude.com/docs/en/overview>
+- Claude memory model: <https://code.claude.com/docs/en/memory>
+- OpenAI Codex `AGENTS.md`: <https://developers.openai.com/codex/guides/agents-md>
+- MCP architecture: <https://modelcontextprotocol.io/specification/2025-06-18/architecture>
+- MCP transports: <https://modelcontextprotocol.io/specification/2025-06-18/basic/transports>
+- ACP overview: <https://agentclientprotocol.com/protocol/overview>
+- Gemini CLI repository and docs: <https://github.com/google-gemini/gemini-cli>
+- Qwen Code memory docs: <https://qwenlm.github.io/qwen-code-docs/en/users/features/memory/>

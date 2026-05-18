@@ -24,7 +24,7 @@ PermissionEngine 是**唯一**的 gate：所有工具调用 → 都过它 → �
 
 ## 2. 五个核心组件
 
-```
+```text
                 model 流
                    │
                    ▼
@@ -72,7 +72,7 @@ PermissionEngine 是**唯一**的 gate：所有工具调用 → 都过它 → �
 
 PermissionEngine 内部决策走如下流程。**只读这一张图，你应该能复现 90% 的实际行为**。
 
-```
+```text
 input: { tool, args, cwd, sessionPolicy, history }
    │
    ▼
@@ -144,7 +144,7 @@ input: { tool, args, cwd, sessionPolicy, history }
 
 完整 turn 内的事件链。**这是 M3 落地后的形态**——M1-M2 阶段不会出现以下任何 permission / tool 事件。
 
-```
+```text
 turn.started                seq=N
 user.message                seq=N+1   {content: "把测试跑一遍"}
 context.built (M4)          seq=N+2
@@ -209,7 +209,7 @@ turn.completed              seq=N+10  {stopReason: "final"}
 
 ## 6. Worked Example 2：destructive 决策不能复用
 
-```
+```text
 turn N（之前的某个 turn）：
   user 输入 "把 dist 目录清掉"
   → tool=shell, args=`rm -rf dist`

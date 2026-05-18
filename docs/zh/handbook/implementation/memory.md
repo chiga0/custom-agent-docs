@@ -22,7 +22,7 @@ title: "Memory（agent 跨 turn 记住什么）"
 
 ## 2. 四层 memory tier
 
-```
+```text
 ┌──────────────────────────────────────────────────┐
 │ User memory     ~/.config/custom-agent/memory/   │
 │   跨所有项目；偏个人偏好                          │
@@ -47,7 +47,7 @@ title: "Memory（agent 跨 turn 记住什么）"
 
 agent 自己不能直接写 durable memory。它只能产生"candidate"——一份待审议的 diff，由用户决定是否合入。
 
-```
+```text
                 evidence (turn 中的 user message / tool output / model.delta)
                        │
                        ▼
@@ -138,7 +138,7 @@ ContextBuilder（见 [`context.md`](context.md) §3）的 memory 桶按以下顺
 
 **装入 prompt 时的呈现**：
 
-```
+```text
 [memory:user:preference]
 缩进 4 spaces，不要 tab。
 

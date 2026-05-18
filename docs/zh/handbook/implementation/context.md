@@ -18,7 +18,7 @@ ContextBuilder 就一件事：**接收原料（instruction / transcript / memory
 
 输入 vs 输出：
 
-```
+```text
 输入：
   - session id + turn id
   - 当前 turn 的用户消息
@@ -38,7 +38,7 @@ ContextBuilder 就一件事：**接收原料（instruction / transcript / memory
 
 Instructions 是分层覆盖的。顺序从弱到强：
 
-```
+```text
 1. global user instructions       ← ~/.config/custom-agent/AGENTS.md
 2. project root AGENTS.md         ← <repo>/AGENTS.md
 3. directory-scoped AGENTS.md     ← <repo>/<subdir>/AGENTS.md（当 cwd 在 subdir 时）
@@ -150,7 +150,7 @@ ContextBuilder 不直接把 event log 倒进 transcript；要做 **投影**：
 
 Memory 是**可选的、长期的**额外内容；Context 是**每 turn 必算**的当下 view。
 
-```
+```text
 Memory (跨 turn 记什么)            Context (当下看什么)
    │                                 │
    │     ┌──── Memory entries ──────►│

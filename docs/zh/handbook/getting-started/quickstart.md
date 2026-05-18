@@ -31,7 +31,7 @@ npm install
 
 ## 2. 看仓库布局
 
-```
+```text
 custom-agent/
 ├── packages/
 │   ├── schema/        ← AgentEvent 类型定义
