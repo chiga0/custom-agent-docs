@@ -1,0 +1,33 @@
+# Cloudflare Workers + Static Assets 部署配置。
+#
+# 部署流程：
+#   1. CI/Cloudflare: npm ci → npm run build → 产物在 ./dist/
+#   2. wrangler deploy 把 ./dist 作为 static assets 上传
+#   3. 自定义域名 agent.chigao.site 通过 Cloudflare Dashboard 绑定
+#
+# 不引入 SSR / Worker JS：本项目是纯静态 Starlight 站点，不需要
+# Astro Cloudflare adapter（不要在 astro.config.mjs 里加 adapter:
+# cloudflare()）。Worker entry 留空 == assets-only 部署。
+
+name = "custom-agent"
+compatibility_date = "2026-05-18"
+# nodejs_compat 让 wrangler 兼容内置 Node API 的 fallback；本站点不用，
+# 但与 Cloudflare 自动检测建议保持一致，省去重复警告。
+compatibility_flags = ["global_fetch_strictly_public", "nodejs_compat"]
+
+# 静态资源根。Astro 静态构建产物。
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# 单页所有路由都有自己的 index.html，不是 SPA；fallthrough 默认即可。
+
+[observability]
+enabled = true
+
+# 自定义域名 agent.chigao.site 在 Cloudflare Dashboard → Workers →
+# custom-agent → Settings → Triggers → Custom Domains 一次性添加。
+# routes 在这里声明是另一条等效路径，注释保留供以后参考：
+# [[routes]]
+# pattern = "agent.chigao.site/*"
+# zone_name = "chigao.site"
+# custom_domain = true

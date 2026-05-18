@@ -1,0 +1,4 @@
+# Files inside dist/ that wrangler should NOT upload as static assets.
+# Empty = upload everything. Keep this file present even when empty —
+# wrangler requires the file to exist on assets-only deploys.
+

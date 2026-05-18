@@ -32,39 +32,46 @@ npm run preview
 - 引用代码：用 `packages/<pkg>/src/<file>.ts:<symbol>` 形式（未来 docs-ref-check 验证）。
 - 中英混排：术语首次出现给中英文双标，后续可纯英文。
 
-## Cloudflare Pages 部署（需要 maintainer 手动一次）
+## Cloudflare 部署（Workers + Static Assets）
 
-由于 Cloudflare 项目绑定需要登录控制台，下面的步骤需要 maintainer 一次性完成；之后所有 push / PR 都自动触发 build + deploy。
+当前项目（`custom-agent`，绑定域名 `agent.chigao.site`）走 **Cloudflare Workers + Static Assets** 模式：纯静态产物（`dist/`）通过 wrangler 上传到 Workers，不需要 SSR。
 
-### 1. 登录 Cloudflare
+### 仓库内已经就位的文件
 
-进入 [Cloudflare Pages 控制台](https://dash.cloudflare.com/?to=/:account/pages)。
-
-### 2. 创建项目
-
-- 点击 "Create a project" → "Connect to Git"。
-- 选 GitHub → 授权 → 选 `chiga0/custom-agent-docs` 仓库。
-- 项目名：`custom-agent-docs`（建议；将变成 staging URL 子域名）。
-
-### 3. 配置 build
-
-| 设置 | 值 |
+| 文件 | 作用 |
 |---|---|
-| Production branch | `main` |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-| Root directory | `/`（不需要改）|
-| Environment variable | `NODE_VERSION = 22` |
+| `wrangler.toml` | Workers 项目配置（assets directory / compatibility flags） |
+| `public/.assetsignore` | wrangler 必需文件；列出 `dist/` 中不上传的资源（空 = 全部上传） |
+| `astro.config.mjs` `site:` | 已指向 `https://agent.chigao.site` 让 sitemap / 绝对 URL 正确 |
 
-### 4. 部署后
+### 在 Cloudflare Dashboard 一次性操作
 
-- 自动 staging：`custom-agent-docs.pages.dev`。
-- PR preview：自动开启；每个 PR 一个 `pr-<num>.custom-agent-docs.pages.dev`。
-- Prod 域名（自定义）：在项目 → Custom Domains 添加；建议 `docs.custom-agent.dev` 或类似（需要持有该域名）。
+1. **绑定 GitHub repo**：Workers → custom-agent → Settings → Build → connect `chiga0/custom-agent-docs`。
+2. **Build 配置**（如未自动检测）：
+   - Build command: `npm run build`
+   - Deploy command: `npx wrangler deploy`（此命令读 `wrangler.toml`）
+   - Root directory: `/`
+3. **Custom domain**：Settings → Triggers → Custom Domains → Add `agent.chigao.site`。
+4. **DNS**：在 `chigao.site` zone 添加 CNAME `agent` → `custom-agent.<account>.workers.dev`（或让 Cloudflare 自动建）。proxy 状态 `Proxied`（橙色云）。
+5. **环境变量**：Settings → Variables and Secrets → 加 `NODE_VERSION=22`（如果默认 Node 版本不对）。
 
-### 5. 同步到 `astro.config.mjs`
+### 部署触发
 
-把 `astro.config.mjs` 中 `site:` 改为最终 prod 域名（影响 sitemap / RSS / 绝对 URL）。
+push 到 `main` 自动触发 build + deploy（首次绑定 GitHub 后即生效）。PR 自动 preview 由 Cloudflare 控制；如未开启在 Workers → Settings → Build → "Preview deployments" 打开。
+
+### 备选方案：切到 Cloudflare Pages（更简单，无需 wrangler.toml）
+
+如果你想切到 Pages 模式：
+
+1. 删掉当前 Workers 项目。
+2. 在 Pages 控制台 Create project → Connect Git。
+3. Build command: `npm run build` / Build output directory: `dist` / 不需要 deploy command。
+4. 仓库根的 `wrangler.toml` 和 `public/.assetsignore` 可以删（Pages 不读）。
+
+Workers vs Pages 对当前纯静态站点的可见差异：
+- Workers 提供 observability dashboard 更细；Pages 集成 GitHub workflow 更顺。
+- Workers + Static Assets 是 Cloudflare 2025 后主推方向；Pages 仍长期维护。
+- 两者底层 edge 网络与 APAC 表现一致。
 
 ## CI 流水线
 
