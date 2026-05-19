@@ -2,7 +2,7 @@
 title: "Roadmap 状态中心"
 ---
 
-最后更新：2026-05-18
+最后更新：2026-05-19
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -67,8 +67,8 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
-| M1-ACP-HTTP | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-acp-http` | `apps/acp-daemon`：HTTP+SSE 网关 + Streamable HTTP transport spec + 1:1 子进程 + bearer auth + 多 session 测试 | `apps-acp` | PR #5 已 merge；rebase main → 本地 quality gate → ready review |
-| M1-QA-01 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-qa-01-golden-fixtures` | golden transcript fixtures + normalized projection + replay/live equivalence test | `ci-quality` | 实现 → 本地 quality gate → 开 PR |
+| M1-ACP-HTTP | `REVIEW` | Claude Opus 4.7 | PR #6 (`m1-acp-http`) | `apps/acp-daemon`：HTTP+SSE 网关 + Streamable HTTP transport spec + 1:1 子进程 + bearer auth + 多 session 测试 | `apps-acp` | rebased onto main (单 commit `b5bc812` 在 `d005879` 之上)；本地 quality gate PASS（15 files / 116 tests）；待 cross-reviewer Round 2 PASS → merge |
+| M1-QA-01 | `REVIEW` | Claude Opus 4.7 | PR #7 (`m1-qa-01-golden-fixtures`) | golden transcript fixtures + normalized projection + replay/live equivalence test | `ci-quality` | 已开 PR，CI 全绿；待 cross-reviewer Round 2 PASS → merge |
 
 ## 6. 推荐并行切分
 
@@ -102,9 +102,9 @@ title: "Roadmap 状态中心"
 | M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
 | M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
 | M1-ACP-STDIO | ACP stdio server         | `DONE` | M1-01, M1-03       | core agent         | merged to main (`d005879`) — official Zed ACP SDK stdio server + schema subpath + 69 tests |
-| M1-ACP-HTTP | ACP Streamable HTTP daemon | `IN_PROGRESS` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec；PR #5 已 merge，需 rebase main |
+| M1-ACP-HTTP | ACP Streamable HTTP daemon | `REVIEW` | M1-ACP-STDIO      | core agent         | `apps/acp-daemon`：HTTP+SSE 网关 + 项目自有 transport spec；PR #6 rebased on main，CI 绿，待 cross-reviewer PASS |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
-| M1-QA-01  | Golden Transcript Fixtures | `IN_PROGRESS` | M1-01 初版 schema  | qa agent           | normalized replay fixture 稳定                            |
+| M1-QA-01  | Golden Transcript Fixtures | `REVIEW` | M1-01 初版 schema  | qa agent           | PR #7 提交、CI 绿，待 cross-reviewer PASS                  |
 
 ## 8. 未开始队列
 
@@ -215,6 +215,7 @@ PR 关闭或放弃后：
 | 2026-05-18 | docs Phase 2 + Phase 4 P0 | Phase 2: Astro Starlight 项目脚手架（package.json / astro.config.mjs / src/content.config.ts / docs/zh/index.md splash / docs-build.yaml / docs-link-check.yaml / SITE-SETUP.md）；Phase 4 P0: 重写 3 个弱章节（implementation/tools-and-permissions.md / context.md + memory.md 拆分 / from-zero.md 含 checkpoint 代码） | maintainer 需在 Cloudflare 控制台一次性绑定项目（见 SITE-SETUP.md）；Phase 3 内容物理迁移待 M1 完结 |
 | 2026-05-18 | docs Phase 4 P1 完成 | 重写 A2 audit 2/5 评分的剩余 5 个章节：implementation/skills.md（lazy-loading 问题方案对比图 + allowed_tools 与 PermissionEngine 协作 + 事件链） / implementation/mcp.md（server 生命周期 + tool/resource/prompt 三类对比 + 完整事件链） / advanced/remote-execution.md（mobile 定位 + auth scope 分级） / advanced/plugin-system.md（manifest schema + 与 MCP 边界）/ advanced/automation.md（trigger 模型 + 自动化权限 timeout）；旧 layers/{skills,mcp,future-capabilities}.md 加 stale notice 指向重写版。本地 build 验证 99 pages（+10）/ 15487 词（+2211）/ 1.86s | Phase 4 P2 剩 4 章（core-layer / model-gateway / storage-and-replay / client-adapters）；Phase 3 仍待 M1 完结 |
 | 2026-05-18 | M1-ACP-STDIO 合入 main | PR #5 通过 Codex Round 3 mainline-guardian PASS；merge SHA `d005879` | ACP stdio canonical wire 完成；M1-ACP-HTTP 可 rebase main 并推进 ready review |
+| 2026-05-19 | M1-ACP-HTTP rebase 完成 + promote ready | PR #6 rebase 到 main（单 commit `b5bc812` 在 `d005879` 之上），本地 quality gate 全绿（15 files / 116 tests），base 已切到 main | M1-ACP-HTTP 进入 REVIEW；等 cross-reviewer Round 2 PASS → admin merge |
 
 ## 13. 更新检查清单
 
