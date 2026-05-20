@@ -141,28 +141,76 @@ Executor 不能自己决定是否允许执行。
 
 ## 必须事件
 
-M3-01 已落地：
+M3-01 + M3-02 已落地：
 
-- `tool.permission_requested` ✅
-- `tool.permission_resolved` ✅
+- `tool.permission_requested` ✅（M3-01）
+- `tool.permission_resolved` ✅（M3-01）
+- `tool.started` ✅（M3-02，含 `toolCallId` + 可选 `permissionRequestId`）
+- `tool.delta` ✅（M3-02，`kind: "stdout" | "stderr" | "result"`）
+- `tool.completed` ✅（M3-02，含 `deltaCount` + `truncated`）
+- `tool.failed` ✅（M3-02，含 `errorCode`）
 
-M3-02+ 计划：
-
-- `tool.started`
-- `tool.delta`
-- `tool.completed`
-- `tool.failed`
+`ToolErrorCode` 联合：`permission_denied / path_unsafe / not_found / io_error / budget_exceeded / cancelled / unknown`。
 
 没有这些事件，就无法审计。
 
+## ToolRouter 与 3 个 read-only 工具（M3-02 落地）
+
+`packages/tools/` 实现：
+
+```ts
+const router = new ToolRouter({
+  permissionEngine,
+  toolEventSink,   // 由 SessionEngine 适配器在 M3-02b 接 EventStore
+  cwd: session.cwd,
+  tools: DEFAULT_READONLY_TOOLS,   // read_file / list_files / search_text
+  outputBudgetBytes: 64 * 1024,
+});
+
+const { toolCallId, outcome } = await router.dispatch(
+  { toolName: "read_file", args: { path: "src/index.ts" }, reason: "agent wants to read" },
+);
+```
+
+`dispatch` 生命周期：
+
+1. tool 未注册 → 立刻 emit `tool.failed { not_found }`；**不**询问 PermissionEngine。
+2. PermissionEngine `requestPermission` → 同时 emit 一对 `tool.permission_*` 事件。
+3. 拒绝（policy 或 user）→ emit `tool.failed { permission_denied }`，executor 永不运行。
+4. 允许 → emit `tool.started`（带 `permissionRequestId` 配对回 §M3-01 事件）。
+5. `tool.execute(args, ctx)`；每次 `ctx.emit(chunk)` 走 BudgetAccumulator → emit `tool.delta`。
+6. 完成 → `tool.completed { deltaCount, truncated }`；失败 → `tool.failed { errorCode, message }`。
+
+### 3 个工具
+
+| 工具 | risk | 行为 | 安全网 |
+|------|------|------|--------|
+| `read_file` | read | 读 UTF-8 文件 → 一条 `result` chunk | path traversal → `path_unsafe`；ENOENT → `not_found` |
+| `list_files` | read | 列目录，可 `recursive`，跳 hidden + `node_modules/.git/dist/...` | 同上；非目录 → `io_error` |
+| `search_text` | read | 字面量子串递归搜，按扩展名识别文本文件 | 同上；`maxMatches` 默认 200；二进制扩展名跳过 |
+
+`OutputBudget` 默认 64 KiB；超出后剩余 chunk 被截断 + 末尾追加 `…[output truncated: budget exceeded]`，`tool.completed.truncated=true`。
+
+### Path safety
+
+`resolveInsideCwd(cwd, rawPath)` 是唯一允许的路径解析入口：
+
+- `..` 越界 → `undefined`
+- `/etc/passwd` 等绝对路径在 cwd 外 → `undefined`
+- 兄弟前缀攻击（`/tmp/cwd-evil` 当 cwd 是 `/tmp/cwd`）→ `undefined`（用 `cwd + sep` 后缀防御）
+
+### Gitignore 延后
+
+M3-02 用一个固定 skip-list（`node_modules / .git / dist / build / coverage / .next / .turbo / .vite`）+ 跳过 dotfiles 近似。真 .gitignore 解析（含 negation、glob）M3-02b 接 `ignore` 包，与 SessionEngine 模型循环一起落地。
+
 ## 最小工具集合
 
-- `read_file`
-- `list_files`
-- `search_text`
-- `shell`
-- `apply_patch`
-- `git_diff`
+- `read_file` ✅（M3-02）
+- `list_files` ✅（M3-02）
+- `search_text` ✅（M3-02）
+- `shell`（M3-03）
+- `apply_patch`（M3-03+）
+- `git_diff`（M3-03+）
 
 先做 read/search，再做 shell/patch。
 
