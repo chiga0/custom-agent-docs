@@ -68,7 +68,9 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-_当前活跃工作表已清空：M3-01 已完成 Round 1 + Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-20 条目）。_
+| Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
+| ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
+| M3-02 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m3-02-readonly-tools` | 新建 `packages/tools/`；`Tool` port + `ToolRouter`（接 PermissionEngine + 发 4 类 `tool.*` 事件）+ 3 个工具 `read_file` / `list_files` / `search_text`；路径安全 + 输出预算。**延后**：gitignore 解析、SessionEngine 接 ToolRouter（M3-02b）| `schema-events` + 新 `tools` | 实现 → 本地 quality gate → 开 draft PR |
 
 ## 6. 推荐并行切分
 
@@ -121,7 +123,8 @@ M3 工作项：
 | Work ID | Backlog 项 | 状态 | 依赖 | 推荐 owner 类型 | 验收摘要 |
 | ------- | ---------- | ---- | ---- | --------------- | -------- |
 | M3-01 | Permission Engine | `DONE` | M1-03 | core/permissions agent | merged to main (`6288cd7`) — PermissionEngine + DEFAULT_POLICY + ApprovalSource + EventSink + 2 个 schema 事件类型；24 files / 222 tests |
-| M3-02 | Read/Search Tools | `READY` | M3-01 | core agent | `read_file` / `list_files` / `search_text` + output budget；path safety / gitignore 测试；ToolRouter 接 PermissionEngine + tool.{started,delta,completed,failed} 事件 |
+| M3-02 | Read/Search Tools (a) | `IN_PROGRESS` | M3-01 | core agent | `read_file` / `list_files` / `search_text` + ToolRouter 接 PermissionEngine + 4 类 `tool.*` 事件 + 输出预算 + 路径安全。**延后到 M3-02b**：gitignore + SessionEngine 模型循环接 ToolRouter |
+| M3-02b | Tools wire into SessionEngine | `TODO` | M3-02 + M2-02b | core agent | 模型 tool-use 协议解析（Anthropic / OpenAI tool_use）→ ToolRouter → 结果回喂模型；Web event timeline 展示 tool.* 事件；gitignore 解析 |
 | M3-03 | Shell Tool | `TODO` | M3-01 | core agent | 受 PermissionEngine 守护的 shell 调用 |
 
 ## 8. 未开始队列
