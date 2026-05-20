@@ -119,25 +119,27 @@ type PermissionPolicy = {
 
 Executor 不能自己决定是否允许执行。
 
-## 风险分类
+## 风险分类（schema `ToolRisk` 联合）
 
-建议初始分类：
+M3-01 schema 落地 4 类（`packages/schema` `ToolRisk` 联合）：
 
 - `read`：读取项目文件或状态。
 - `write`：修改文件、memory、配置。
 - `execute`：运行命令、测试、脚本。
 - `network`：访问外部网络。
-- `credential`：读取或使用凭证。
-- `destructive`：删除、覆盖、reset、deploy。
 
-默认策略：
+默认策略 `DEFAULT_POLICY`：
 
-- `read` 可以自动 allow。
-- `write` 默认 ask。
-- `execute` 默认 ask。
-- `network` 默认 ask。
-- `credential` 默认 deny 或强确认。
-- `destructive` 默认 deny 或强确认。
+- `read` → `allow`。
+- `write` / `execute` / `network` → `ask`。
+- `defaultDecision` → `ask`。
+
+**M3-03+ 候选扩展**（未落地，按需 PR + ADR）：
+
+- `credential`（读取或使用凭证）— 默认 deny 或强确认。
+- `destructive`（删除、reset、deploy）— 默认 deny 或强确认。
+
+新增 risk 需要同时改 `ToolRisk` 联合 + `DEFAULT_POLICY` + handbook，避免现在的 doc-vs-schema 漂移再发生。
 
 ## 必须事件
 
