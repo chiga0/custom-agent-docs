@@ -207,6 +207,7 @@ ModelProvider port + `ProviderError` 错误类层级都在 `packages/core/src/po
 | `ProviderUnknownError` | `unknown` | 兜底，保留 cause |
 
 `toTurnErrorCode(error)`：
+
 - `ProviderContextOverflow` → `"context_overflow"`
 - 其余 → `"provider_failure"`
 
