@@ -2,124 +2,101 @@
 title: "Client 与 Protocol Adapters"
 ---
 
-> ⚠️ **本章节部分内容已被 [[adr-0004]] 取代** —— 原"三种 wire 协议"表格 / "ACP=stdio, Web=SSE, CLI=进程内"的描述作废。新决策：统一 ACP 协议 + stdio / Streamable HTTP 两种 transport，所有 client 都是 ACP adapter。本文件 Phase 4 重写时一并更新；目前请以 [[adr-0004]] 为准。
+> 本章节已根据 [[adr-0004]] 与 M1 实际落地（M1-ACP-STDIO、M1-ACP-HTTP、M1-04、M1-WEB-01）整体重写。Web / CLI / TUI / IDE / Mobile 都是同一份 **Zed Agent Client Protocol (ACP)** 的 client，只是 transport 不同。不再存在"每个 client 一套 wire"的旧模型。
 
 ## 真实作用
 
 Client 和 protocol adapter 负责把 agent core 的事件流呈现给用户或外部系统。
 
-它们不拥有 agent 行为。
+它们不拥有 agent 行为；不存储 session state；不构建 context；不直接执行 tool。
 
-## 内外两层区分（[[adr-0003]] T1 / T4）
+## 内外两层
 
-明确两层：
+- **内层（agent core 拥有）：** `AgentEvent` 是 session 的真值；`SessionEngine.runTurn()` 返回的 `AsyncIterable<AgentEvent>` 是进程内抽象，**不是对外协议**。任何 client 都不能拿到原始 `AgentEvent` JSON。
+- **外层（外部协议 = Zed ACP）：** 唯一的对外协议是 ACP。所有 client（Web / CLI / TUI / IDE / Mobile）都通过 ACP 的 `session/update` 通知接收事件，通过 `initialize` / `session/new` / `session/load` / `session/prompt` / `session/cancel` 发起请求。
 
-- **内层（不变量，由 core 拥有）：** `AgentEvent` 是 session 真值；`SessionEngine.runTurn()` 返回 `AsyncIterable<AgentEvent>` 只是进程内抽象，**不是对外协议**。
-- **外层（每个 client 自己定义的 wire）：**
+`apps/acp-server/src/event-mapper.ts` 是唯一的 `AgentEvent → SessionUpdate` 翻译入口。**禁止** 直接把 `AgentEvent` 通过任何 wire 透传给外部。
 
-| Client | Wire 协议 | 实现位置 | 状态 |
-| ------ | --------- | -------- | ---- |
-| Web | HTTP + Server-Sent Events (SSE) | `apps/web-client` + 后续 backend route | M1-04 起步规范 |
-| CLI | 进程内直接调用，按事件序列化为 ANSI/文本 | `apps/cli` | 占位中，M1-04 之后落地 |
-| ACP | JSON-RPC 2.0 over stdio（**严格遵守 Zed Agent Client Protocol**） | `apps/acp-server` | M8 deliverable |
+## Transport 矩阵（ADR-0004）
 
-**禁止：** 直接把 `AgentEvent` JSON 通过 ws/sse 透传给外部。每个 client 都必须经过 mapper 把 `AgentEvent` 翻译成对应协议的 update 类型。不存在"自研 EventSource 协议"，async-iterable 仅用于进程内编排。
+ACP 协议只有一套；transport 有两种实现：
 
-Client 类型：
+| Transport | 实现位置 | 谁用 |
+| --------- | -------- | ---- |
+| stdio (JSON-RPC, 1 行 1 帧) | `apps/acp-server` | 编辑器直接 spawn（Zed 等） |
+| Streamable HTTP + SSE | `apps/acp-daemon` 转发到 `apps/acp-server` 子进程 | Web / TUI / Mobile / 远程 client |
 
-- Web。
-- CLI。
-- TUI。
-- IDE。
-- ACP。
-- Mobile。
-- Channel integrations。
+详细 wire spec 见 `apps/acp-daemon/SPEC.md`（HTTP+SSE 的 endpoint、auth、cursor、replay 语义、session id 校验规则）。
 
-## 统一接口
+## ACP Server（`apps/acp-server`）— M1-ACP-STDIO
 
-所有 client 应围绕同一组能力：
+- 单进程拥有最多一个 session。多 session 由 daemon 多 spawn 子进程实现。
+- 实现 `Agent` 接口：`initialize` / `authenticate` / `newSession` / `loadSession` / `prompt` / `cancel`。
+- 用官方 Zed ACP SDK 的 `AgentSideConnection + ndJsonStream` 处理 framing / dispatch / cancel-as-notification 等协议细节。
+- 持久化通过 `JsonlSessionStore`：`<ACP_EVENT_LOG_ROOT>/<sessionId>.jsonl`，单 session 单文件。
+- `loadSession` 是 M1-04 的入口：读 JSONL → `mapEventToUpdate` → 发 `session/update` 通知 → 返回 `{}`。loadSession 后 prompt 被拒绝（"replay only"），engine 状态未从事件重建。
 
-- Create/load session。
-- Send prompt。
-- Stream events。
-- Resolve permission request。
-- Replay session。
-- Inspect artifacts。
-- Cancel turn。
+## ACP Daemon（`apps/acp-daemon`）— M1-ACP-HTTP
 
-## Web Client
+- HTTP+SSE 网关。POST `/rpc` 收 JSON-RPC，GET `/events` 推 `session/update`，GET `/healthz` liveness。
+- Bearer token 鉴权（fail-closed），`X-ACP-Session-Id` 路由 + body `params.sessionId` 一致性校验（不一致 400）。
+- 每个 ACP session 对应一个 `apps/acp-server` 子进程；session 之间 crash 隔离。
+- session id 必须匹配 `^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$`（防 path traversal / header injection / 日志噪音）。
+- 子进程通过 `ACP_EVENT_LOG_ROOT` 环境变量共享 event log root，让 writer / replay 子进程都能定位同一份 JSONL。
+- Per-session SSE cursor：环形 buffer 256 条，monotonic 1-起步，`Last-Event-ID` 重连，cursor 超出窗口写 `event: cursor_lost` 并关闭。
+- 子进程 crash 时发 `event: terminated` + `data: {"jsonrpc":"2.0","method":"_daemon/terminated","params":{...}}`，30 s grace 后 GC。
 
-Web 是第一回归面。
+## Web Client（`apps/web-client`）— M1-WEB-01
 
-必须优先支持：
+Web 是第一回归面与可观测面，纯 ACP client：
 
-- Session list。
-- Transcript。
-- Event timeline。
-- Permission panel。
-- Tool inspector。
-- Diff viewer。
-- Context inspector。
-- Regression runner。
+- 配置 daemon URL + bearer token。
+- `Start new session` → `session/new` → 绑定 SSE → `session/prompt` 驱动一轮 turn。
+- `Load by id` → `session/load` → SSE 回放历史 `session/update`。
+- `End session` 主动断开 SSE。
 
-## CLI
+实现按 4 层切分：
 
-CLI 是薄 adapter。
+- `transcript.ts` 纯 reducer：`applySessionUpdate(state, update)`，role-coalescing user/agent 文本块。
+- `sse.ts` 纯解析器：手写 SSE 帧解析（fetch + ReadableStream，不用 EventSource——它发不了 bearer header）。
+- `daemon-client.ts` wire helpers：`newSession` / `loadSession` / `prompt` / `subscribe()`（AsyncIterable&lt;StreamEvent&gt;）。
+- `main.ts` DOM glue：按钮、输入、transcript 渲染、状态行；render 函数 `renderTranscriptHtml` 对 user/agent 文本做 HTML escape。
 
-职责：
+forward-compat：transcript reducer 对未知 `SessionUpdate` 变种（tool_call / plan）no-op，保证 M3+ 协议拓展不会让 web shell 崩。
 
-- 读取用户输入。
-- 渲染 streaming text。
-- 展示 approval prompt。
-- 支持 slash commands。
-- 支持 non-interactive mode。
+## CLI（`apps/cli`）— 占位
 
-CLI 不应该实现自己的 agent loop。
+未实现。计划：
 
-## ACP Server
+- 同样走 ACP wire（stdio 或 daemon HTTP）。
+- 渲染 streaming text + 接收 approval prompt。
+- 不实现自己的 agent loop。
 
-ACP 是 protocol adapter。
+## 远程 / Mobile / IDE / TUI
 
-职责：
+都是同一份 ACP client。Mobile remote-control 等高级形态见 [[advanced/remote-execution]]。
 
-- JSON-RPC transport。
-- Method mapping。
-- Event-to-update。
-- Permission forwarding。
-- Error mapping。
+## 边界规则（mainline-guardian 守护）
 
-ACP 不应该：
+`tests/architecture/architecture-fitness.test.ts` 强制：
 
-- 构建 context。
-- 执行 tools。
-- 修改 memory。
-- 拥有 session state machine。
+- `apps/acp-daemon` 不得依赖 `packages/core`（daemon 是纯 transport）。
+- `apps/web-client` 不得依赖 `packages/core` / `packages/storage`（web 只走 ACP wire）。
+- `packages/core` 不得依赖 `apps/*`（client 不能反向耦合 core）。
 
-## Mobile Remote-Control
+违反者 CI 直接 fail。
 
-移动端未来作为 remote-control client：
+## 测试策略（每层各管一段）
 
-- 查看 session。
-- 接收通知。
-- 批准权限。
-- 暂停/恢复/取消任务。
-- 查看结果和 diff 摘要。
-
-移动端不应该运行 agent core。
+- ACP server：单元 + JSONL 持久化 + ACP `session/load` 回放与 `session/new + prompt` 等价。
+- ACP daemon：HTTP+SSE 单元（mock 子进程）+ smoke（real subprocess via `process.execPath`）+ live≡replay 等价 smoke。
+- Web client：transcript reducer / SSE parser / daemon-client wire 三类纯单元 + view escape 测试。
+- 跨包：`packages/qa-fixtures` 提供 canonical fake turn 的 normalized fixture，daemon / acp-server / web client 任何一层 drift 都会同时被 golden 与 live≡replay 触发。
 
 ## 常见坑
 
-- Web 直接写 storage。
-- CLI 和 Web 各自维护 session state。
-- ACP adapter 复制 core state machine。
-- Mobile 为了方便绕过 permission API。
-- Client projection 与 replay projection 不一致。
-
-## 测试策略
-
-- Event fixture rendering。
-- Live/replay equivalence。
-- Permission approval flow。
-- Cancel flow。
-- ACP JSON-RPC fixtures。
-- Mobile control event fixtures。
+- Client 直接读写 `packages/storage` —— 用 ACP `session/load`。
+- 自创 wire 协议 —— ADR-0004 之后只有 ACP。
+- 在 ACP server / daemon 里放业务逻辑 —— 只许 mapping、路由、forwarding。
+- 用 EventSource —— 它不允许自定义 header；daemon 的 bearer auth 走不通。
+- session id 没校验直接当文件名 —— path traversal 漏洞；daemon 已加正则校验，client 端应同样不构造 hostile 值。
