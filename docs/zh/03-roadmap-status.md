@@ -68,9 +68,7 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-| Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
-| ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-_当前活跃工作表已清空：M2-02a 已完成 Round 1 + Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-20 条目）。_
+| M3-01 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m3-01-permission-engine` | PermissionEngine：policy 矩阵 + ask/allow/deny lifecycle + 注入式 approval source + AgentEvent 加 `tool.permission_requested` / `tool.permission_resolved` | `permissions` + `schema-events` | 实现 → 本地 quality gate → 开 draft PR |
 
 ## 6. 推荐并行切分
 
@@ -95,7 +93,7 @@ _当前活跃工作表已清空：M2-02a 已完成 Round 1 + Round 2 self-review
 
 如果一个 PR 同时修改 `schema + core + storage + web`，它应被视为高冲突 PR，需要拆分或在本文件登记为独占工作。
 
-## 7. M1 / M2 工作项状态
+## 7. M1 / M2 / M3 工作项状态
 
 M1 全部 DONE（详见 §4 milestone 总览）：
 
@@ -117,6 +115,14 @@ M2 工作项：
 | M2-01 | Define Model Provider Port | `DONE` | M1-03 | core agent | merged to main (`d314c65`) — `preflightCheck` + `PreflightResult` + SessionEngine 把超限映射成 `turn.completed { stopReason: "error", errorCode: "context_overflow" }` + schema `TurnErrorCode` + fake provider contract test（21 files / 187 tests） |
 | M2-02a | Model Gateway scaffold + RecordedProvider | `DONE` | M2-01 | core/provider agent | merged to main (`c34a986`) — 新 `packages/model-gateway/` + RecordedProvider + ProviderError taxonomy（co-located 在 core ports）+ SessionEngine 接 toTurnErrorCode；24 files / 205 tests |
 | M2-02b | First Real Provider Adapter | `READY` | M2-02a | core/provider agent | 真 SDK 适配（Anthropic / OpenAI / 其他）；fixture recording 工具；真 SDK 错误 → ProviderError 翻译。**前置决定：** errorCode 上 wire 方案（handbook model-gateway "已知 wire-surface 限制" 3 选项） |
+
+M3 工作项：
+
+| Work ID | Backlog 项 | 状态 | 依赖 | 推荐 owner 类型 | 验收摘要 |
+| ------- | ---------- | ---- | ---- | --------------- | -------- |
+| M3-01 | Permission Engine | `IN_PROGRESS` | M1-03 | core/permissions agent | PermissionEngine + policy 矩阵 + ask/allow/deny lifecycle + AgentEvent `tool.permission_requested` / `tool.permission_resolved`；tool executor 无法绕过 permission result |
+| M3-02 | Read/Search Tools | `TODO` | M3-01 | core agent | `read_file` / `list_files` / `search_text` + output budget；path safety / gitignore 测试 |
+| M3-03 | Shell Tool | `TODO` | M3-01 | core agent | 受 PermissionEngine 守护的 shell 调用 |
 
 ## 8. 未开始队列
 
