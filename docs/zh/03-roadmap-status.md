@@ -21,14 +21,15 @@ title: "Roadmap 状态中心"
 
 ## 2. 当前阶段
 
-当前阶段：`M1: Event-Sourced Session Core`
+当前阶段：`M1: Event-Sourced Session Core` — 全部 work item DONE，准备移交至 review/refactor/handbook 收尾阶段，然后开启 `M2: Model Gateway`。
 
-阶段状态：`READY`
+阶段状态：`DONE`（最后一个 work item M1-WEB-01 于 2026-05-20 合入 main，merge SHA `7f39c9f`）
 
 说明：
 
-- `M0: Project Spine and Governance` 已完成 bootstrap，项目已有 monorepo、CI、基础 schema、core/storage/permissions 占位、Web shell、architecture fitness test、中文默认文档和 mainline rules。
-- 下一步进入 `M1`，重点是把当前占位实现推进为真正的 append-only event log、session index、session replay 和 Web event timeline。
+- `M0: Project Spine and Governance` 已完成 bootstrap。
+- `M1` 实质完成：append-only event log + SQLite session index + SessionEngine + ACP stdio/HTTP 双 transport + session/load replay + golden 回归 fixture + Web event timeline。
+- 下一阶段是 `M2: Model Gateway` — 在 M1 review/refactor/handbook 收尾后启动。
 - `M2+` 暂不并行实现，除非先完成对应 ADR 并确认不会扰动 M1 event/session 边界。
 
 ## 3. 状态定义
@@ -49,8 +50,8 @@ title: "Roadmap 状态中心"
 | Milestone                               | 状态       | 当前判断                                         | 入口文档                                                             |
 | --------------------------------------- | ---------- | ------------------------------------------------ | -------------------------------------------------------------------- |
 | M0 Project Spine and Governance         | `DONE`     | 初始化完成，后续只做补强                         | [Backlog](07-implementation-backlog.md#m0项目骨架)                   |
-| M1 Event-Sourced Session Core           | `READY`    | 当前推荐主攻方向                                 | [Roadmap](02-roadmap.md#m1event-sourced-session-core)                |
-| M2 Model Gateway                        | `TODO`     | 等 M1 event/session 边界稳定                     | [Roadmap](02-roadmap.md#m2model-gateway)                             |
+| M1 Event-Sourced Session Core           | `DONE`     | 全部 work item 合入 main；进入 review/refactor/handbook 收尾 | [Roadmap](02-roadmap.md#m1event-sourced-session-core)                |
+| M2 Model Gateway                        | `READY`    | M1 wire 完成，event/session 边界稳定，可开工     | [Roadmap](02-roadmap.md#m2model-gateway)                             |
 | M3 Local Tools and Permission Engine    | `TODO`     | 等 M1 session/event 与 M2 provider port 初步稳定 | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
 | M4 Context, Instructions and Compaction | `TODO`     | 等 M1-M3 基础能力成型                            | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
 | M5 Skills                               | `TODO`     | 等 context builder 成型                          | [Roadmap](02-roadmap.md#m5skills)                                    |
@@ -67,7 +68,8 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-| M1-WEB-01 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-web-01-event-timeline` | Web client 通过 ACP daemon HTTP 拉取 live/replayed event stream：daemon 连接配置 + session/new + session/load + session/prompt + SSE 订阅 + transcript 渲染 | `web-timeline` | 实现 → 本地 quality gate → 开 draft PR |
+
+_当前活跃工作表已清空：M1 全部 work item 完成 → review/refactor/handbook 收尾 → M2 启动。_
 
 ## 6. 推荐并行切分
 
@@ -102,7 +104,7 @@ title: "Roadmap 状态中心"
 | M1-04     | Replay API                 | `DONE`  | M1-01, M1-03, M1-ACP-HTTP | core/storage agent | merged to main (`ac22643`) — ACP `session/load` over Streamable HTTP：acp-server loadSession + 共享 event log root + acp-daemon 路由 + live≡replay 等价 smoke |
 | M1-ACP-STDIO | ACP stdio server         | `DONE` | M1-01, M1-03       | core agent         | merged to main (`d005879`) — official Zed ACP SDK stdio server + schema subpath + 69 tests |
 | M1-ACP-HTTP | ACP Streamable HTTP daemon | `DONE`  | M1-ACP-STDIO      | core agent         | merged to main (`2c3414f`) — apps/acp-daemon HTTP+SSE 网关 + 项目自有 transport spec + 1:1 子进程 + bearer auth + session GC + header/body sessionId 一致性 |
-| M1-WEB-01 | Web Event Timeline         | `IN_PROGRESS` | M1-ACP-HTTP, M1-04 | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
+| M1-WEB-01 | Web Event Timeline         | `DONE`  | M1-ACP-HTTP, M1-04 | web agent          | merged to main (`7f39c9f`) — Web client 通过 ACP daemon HTTP 渲染 live/replay；29 个新测试覆盖 transcript reducer、SSE 解析、wire shape、XSS 转义 |
 | M1-QA-01  | Golden Transcript Fixtures | `DONE`  | M1-01 初版 schema  | qa agent           | merged to main (`5cddb0c`) — packages/qa-fixtures（normalized projection + golden fixture + live/replay/fixture 三层等价断言） |
 
 ## 8. 未开始队列
@@ -217,6 +219,7 @@ PR 关闭或放弃后：
 | 2026-05-19 | M1-ACP-HTTP rebase 完成 + promote ready | PR #6 rebase 到 main（单 commit `b5bc812` 在 `d005879` 之上），本地 quality gate 全绿（15 files / 116 tests），base 已切到 main | M1-ACP-HTTP 进入 REVIEW；等 cross-reviewer Round 2 PASS → admin merge |
 | 2026-05-19 | M1-ACP-HTTP / M1-QA-01 self-review 双轮 + admin merge | 维护者 explicit 授权，跳过 cross-reviewer：(a) Round 1 self-review 发到 thread（P1 + P2 + P3）；(b) 在 branch 上落地全部 P1 + 主要 P2 + 关键 P3 patch；(c) Round 2 self-review PASS；(d) `gh pr merge --admin` 依次合入 | PR #6 → main (`2c3414f`)，PR #7 → main (`5cddb0c`)；M1 实质完成 ACP 双 transport + golden 回归基础设施。M1 剩余主项：M1-04 Replay API、M1-WEB-01 Web Event Timeline |
 | 2026-05-20 | M1-04 self-review 双轮 + admin merge | 同维护者授权流程：claim → 实现（acp-server loadSession + 共享 event log root + acp-daemon session/load 路由 + SPEC.md §4/§6.2 + 12 个测试包括 live≡replay smoke）→ Round 1 self-review（0 P1 + 4 P2 + 3 P3）→ patch（eager-GC、stderr observability、registerSession helper、additionalDirectories void、import cleanup）→ Round 2 PASS → admin merge | PR #8 → main (`ac22643`)；M1 剩余主项仅 M1-WEB-01；M1 wire 层全部完成 |
+| 2026-05-20 | M1-WEB-01 self-review 双轮 + admin merge → M1 milestone DONE | 同流程：claim → 实现（apps/web-client 引入 transcript reducer + SSE 解析 + daemon-client + DOM glue + 29 个测试）→ Round 1 self-review（0 P1 + 5 P2 + 3 P3）→ patch（fitness edge web-client→core/storage、daemon-client beforeEach hoist、End-session 按钮）→ Round 2 PASS → admin merge。M1 全部 work item 进入 DONE | PR #9 → main (`7f39c9f`)；M1 milestone 翻 DONE；M2 Model Gateway 翻 READY；下一阶段先做 review/refactor/handbook 收尾再启动 M2 |
 
 ## 13. 更新检查清单
 
