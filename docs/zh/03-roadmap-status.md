@@ -70,7 +70,7 @@ title: "Roadmap 状态中心"
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-| M2-02a | `IN_PROGRESS` | Claude Opus 4.7 | branch `m2-02a-recorded-provider` | 新建 `packages/model-gateway/`；RecordedProvider（读 JSONL fixture，离线 CI）；ProviderError 错误归一化；handbook M2-02a 段。**不**装真 SDK；真 SDK adapter 留给 M2-02b | `core-session` + `schema-events`（leaf 包，不动 core） | 实现 → 本地 quality gate → 开 draft PR |
+_当前活跃工作表已清空：M2-02a 已完成 Round 1 + Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-20 条目）。_
 
 ## 6. 推荐并行切分
 
@@ -115,8 +115,8 @@ M2 工作项：
 | Work ID | Backlog 项 | 状态 | 依赖 | 推荐 owner 类型 | 验收摘要 |
 | ------- | ---------- | ---- | ---- | --------------- | -------- |
 | M2-01 | Define Model Provider Port | `DONE` | M1-03 | core agent | merged to main (`d314c65`) — `preflightCheck` + `PreflightResult` + SessionEngine 把超限映射成 `turn.completed { stopReason: "error", errorCode: "context_overflow" }` + schema `TurnErrorCode` + fake provider contract test（21 files / 187 tests） |
-| M2-02a | Model Gateway scaffold + RecordedProvider | `IN_PROGRESS` | M2-01 | core/provider agent | 拆自原 M2-02。新 `packages/model-gateway/` + RecordedProvider（fixture-replay，离线 CI）+ ProviderError normalize 起点。**不**装真 SDK |
-| M2-02b | First Real Provider Adapter | `TODO` | M2-02a | core/provider agent | 真 SDK 适配（Anthropic / OpenAI / 其他）；fixture recording 工具；真 SDK 错误 → ProviderError 翻译。**前置决定：** errorCode 上 wire 方案（handbook model-gateway "已知 wire-surface 限制" 3 选项） |
+| M2-02a | Model Gateway scaffold + RecordedProvider | `DONE` | M2-01 | core/provider agent | merged to main (`c34a986`) — 新 `packages/model-gateway/` + RecordedProvider + ProviderError taxonomy（co-located 在 core ports）+ SessionEngine 接 toTurnErrorCode；24 files / 205 tests |
+| M2-02b | First Real Provider Adapter | `READY` | M2-02a | core/provider agent | 真 SDK 适配（Anthropic / OpenAI / 其他）；fixture recording 工具；真 SDK 错误 → ProviderError 翻译。**前置决定：** errorCode 上 wire 方案（handbook model-gateway "已知 wire-surface 限制" 3 选项） |
 
 ## 8. 未开始队列
 
@@ -233,6 +233,7 @@ PR 关闭或放弃后：
 | 2026-05-20 | M1-WEB-01 self-review 双轮 + admin merge → M1 milestone DONE | 同流程：claim → 实现（apps/web-client 引入 transcript reducer + SSE 解析 + daemon-client + DOM glue + 29 个测试）→ Round 1 self-review（0 P1 + 5 P2 + 3 P3）→ patch（fitness edge web-client→core/storage、daemon-client beforeEach hoist、End-session 按钮）→ Round 2 PASS → admin merge。M1 全部 work item 进入 DONE | PR #9 → main (`7f39c9f`)；M1 milestone 翻 DONE；M2 Model Gateway 翻 READY；下一阶段先做 review/refactor/handbook 收尾再启动 M2 |
 | 2026-05-20 | M1 closeout：cross-cutting audit + refactor + handbook 同步 | Explore agent 在 main 上扫描 7 个 M1 PR，输出 P1×3 + P2×9 + P3×3 审计报告。PR #10 落地 P1：daemon initialize 之前 `loadSession: false` 与 child `true` drift；session id 加 `[A-Za-z0-9][A-Za-z0-9_-]{0,127}` 格式校验（防 path traversal / header injection）；其余 P2/P3 通过 SPEC.md §5/§6.2/§7 文档化 + `requestChildOrCleanup` helper 去重。docs handbook `layers/client-protocol-adapters.md` 整段重写，`layers/session-event-replay.md` 增补 M1 落地映射 | PR #10 → main (`dff3eea`)；docs main (`27357a2`)；M1 milestone 完成「实现 + review + refactor + handbook」全链路；下一阶段开 M2 Model Gateway |
 | 2026-05-20 | M2-01 Model Provider Port self-review 双轮 + admin merge | 同流程：claim → 实现（schema TurnErrorCode + ModelProvider.preflightCheck + FakeStreamingProvider 实现 + SessionEngine preflight 失败映射 turn.completed errorCode + 11 个新测试）→ Round 1 self-review（0 P1 + 3 P2 + 3 P3）→ patch（schema additive evolution guards + handbook 记 wire-surface 限制 disposition 给 M2-02）→ Round 2 PASS → admin merge | PR #11 → main (`d314c65`)；handbook docs main (`3627c4a`)；M2-01 DONE，M2-02 READY 待选 errorCode 上 wire 方案 |
+| 2026-05-20 | M2-02 拆 a/b + M2-02a self-review 双轮 + admin merge | 原 M2-02 "first real provider" 拆为 M2-02a（架构 scaffold + RecordedProvider，离线 CI）+ M2-02b（真 SDK adapter，留给后续 PR）。M2-02a：新 `packages/model-gateway/`、ProviderError 5 类层级、`toTurnErrorCode`、RecordedProvider with `failBefore/failWith` 注入；Round 1 P2 #1 触发 ProviderError 从 model-gateway 迁回 `packages/core/src/ports/`，SessionEngine catch 路径直接 instanceof + toTurnErrorCode（rate_limit → provider_failure，context_overflow → context_overflow）；handbook 更新 | PR #12 → main (`c34a986`)；handbook docs main (`def0a46`)；M2-02a DONE，M2-02b READY 待选真 SDK + wire 方案 |
 
 ## 13. 更新检查清单
 
