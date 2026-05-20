@@ -2,7 +2,7 @@
 title: "Roadmap 状态中心"
 ---
 
-最后更新：2026-05-19
+最后更新：2026-05-20
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -67,7 +67,9 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
-_当前活跃工作表已清空：M1-ACP-HTTP 与 M1-QA-01 均完成 Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-19 条目）。_
+| Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
+| ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
+| M1-04 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-04-replay-api` | ACP `session/load` over Streamable HTTP：acp-server `loadSession` + 共享 event log root（`ACP_EVENT_LOG_ROOT`）+ acp-daemon 路由 + replay/live 等价测试 | `apps-acp` + `core-session` | 实现 → 本地 quality gate → 开 draft PR |
 
 ## 6. 推荐并行切分
 
@@ -99,7 +101,7 @@ _当前活跃工作表已清空：M1-ACP-HTTP 与 M1-QA-01 均完成 Round 2 sel
 | M1-01     | Append-Only Event Log      | `DONE`  | M0-03              | storage agent      | merged to main (`e0cf5aa`) — JSONL event log + replay     |
 | M1-02     | Session Index              | `DONE`  | M1-01              | storage agent      | merged to main (`aadeb8b`) — SQLite session/turn index + JSONL rebuild |
 | M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
-| M1-04     | Replay API                 | `READY` | M1-01, M1-03       | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
+| M1-04     | Replay API                 | `IN_PROGRESS` | M1-01, M1-03, M1-ACP-HTTP | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
 | M1-ACP-STDIO | ACP stdio server         | `DONE` | M1-01, M1-03       | core agent         | merged to main (`d005879`) — official Zed ACP SDK stdio server + schema subpath + 69 tests |
 | M1-ACP-HTTP | ACP Streamable HTTP daemon | `DONE`  | M1-ACP-STDIO      | core agent         | merged to main (`2c3414f`) — apps/acp-daemon HTTP+SSE 网关 + 项目自有 transport spec + 1:1 子进程 + bearer auth + session GC + header/body sessionId 一致性 |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
