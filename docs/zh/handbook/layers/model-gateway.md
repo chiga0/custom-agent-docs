@@ -181,14 +181,75 @@ export class FakeStreamingProvider implements ModelProvider {
 - fake provider 不写 event log；只 yield `ModelStreamEvent`，由 SessionEngine 决定哪些翻成 `AgentEvent`。
 - 测试构造时建议显式传 `chunks` + `maxContextTokens`，让 golden / preflight 失败用例确定性可控。
 
-### M2-02 真实 Provider 适配（TODO）
+### `packages/model-gateway` 包结构（M2-02a）
+
+ModelProvider port 在 `packages/core/src/ports/`，concrete adapter 在 `packages/model-gateway/src/providers/`。架构 fitness 强制：
+
+- `packages/core` → `packages/model-gateway` 反向依赖**禁止**（core 拥有 port，adapter 依赖 core，不能反过来）。
+- `packages/schema` / `packages/storage` / `packages/permissions` → `packages/model-gateway` 同理禁止。
+
+barrel `@custom-agent/model-gateway` 当前导出：
+
+- `ProviderError` 类层级（`ProviderRateLimit` / `ProviderUnauthorized` / `ProviderContextOverflow` / `ProviderServerError` / `ProviderUnknownError`）。
+- `toTurnErrorCode(error)` 把 ProviderError 翻成 schema 的 `TurnErrorCode`。
+- `RecordedProvider` + `ProviderFixture` 形状。
+
+### `ProviderError` 错误归一化（M2-02a）
+
+每个真 provider adapter 在 SDK 异常进入 SessionEngine **之前** 必须翻成下列类之一：
+
+| 类 | code | 语义 |
+| --- | --- | --- |
+| `ProviderRateLimit` | `rate_limit` | 上游限流，可携 `retryAfterMs` |
+| `ProviderUnauthorized` | `unauthorized` | 凭证错误 |
+| `ProviderContextOverflow` | `context_overflow` | 流式途中才发现超窗（preflight 应已拦截，少见） |
+| `ProviderServerError` | `server_error` | 上游 5xx |
+| `ProviderUnknownError` | `unknown` | 兜底，保留 cause |
+
+`toTurnErrorCode(error)`：
+- `ProviderContextOverflow` → `"context_overflow"`
+- 其余 → `"provider_failure"`
+
+> 当前 SessionEngine 还没接 `toTurnErrorCode`（throw 路径默认映射 `"unknown"`，集成测试已 pin 这点）。M2-02b 或单独 follow-up 会把它接上，让 rate-limit / 5xx 在 `turn.completed.payload.errorCode` 有可观测信号。
+
+### `RecordedProvider`（M2-02a 离线 CI）
+
+`packages/model-gateway/src/providers/recorded.ts`。从 `ProviderFixture` 重放一次模型交互——没网络、没 key、没 secret。
+
+```ts
+const provider = new RecordedProvider({
+  fixture: {
+    tokenEstimate: 12,
+    maxContextTokens: 8_000,
+    events: [
+      { kind: "text_delta", delta: "Hello, " },
+      { kind: "text_delta", delta: "world." },
+      { kind: "completed", usage: { promptTokens: 5, completionTokens: 2 } },
+    ],
+  },
+});
+```
+
+失败注入（M2-02b 真 adapter 的参考形态）：
+
+```ts
+{ tokenEstimate: 1, maxContextTokens: 1000,
+  events: [{ kind: "text_delta", delta: "partial" }],
+  failBefore: 1,
+  failWith: { kind: "rate_limit", message: "slow down", retryAfterMs: 1500 } }
+```
+
+集成测试 `packages/model-gateway/src/integration.test.ts` 用 RecordedProvider 驱动 SessionEngine 跑完整 turn——这是 model-gateway 与 core 边界的端到端凭据，不依赖网络也不依赖 fake provider。
+
+### M2-02b 真实 Provider 适配（TODO）
 
 新 provider 应该：
 
 1. 复用厂商官方 SDK 做 HTTP / SSE / 鉴权。
 2. 在 adapter 内部 tokenize 一次，把 `preflightCheck` 接到真 tokenizer（避免重新发明字符近似）。
-3. 在 `stream` 内部把厂商原生 chunk 翻译成 `ModelStreamEvent`，特别注意：错误（包括 rate limit / 5xx）必须翻成 `failed` event 或抛 typed error，不能让 SessionEngine 收到原生 SDK 异常。
-4. 记录 fixture（请求 + 响应）以便 network-disabled CI replay。
+3. 在 `stream` 内部把厂商原生 chunk 翻译成 `ModelStreamEvent`，特别注意：原生 SDK 异常**必须**翻成 `ProviderError` 子类（见 §ProviderError），SessionEngine 不应直接看到 SDK 异常。
+4. 记录 fixture（请求 + 响应）以便 network-disabled CI replay；fixture 文件可由 RecordedProvider 直接消费，二者共享 `ProviderFixture` 形状。
+5. 决定 `errorCode` 上 wire 方案（见上文「已知 wire-surface 限制」）。
 
 ## 成熟实现
 
