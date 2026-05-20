@@ -183,16 +183,16 @@ export class FakeStreamingProvider implements ModelProvider {
 
 ### `packages/model-gateway` 包结构（M2-02a）
 
-ModelProvider port 在 `packages/core/src/ports/`，concrete adapter 在 `packages/model-gateway/src/providers/`。架构 fitness 强制：
+ModelProvider port + `ProviderError` 错误类层级都在 `packages/core/src/ports/`（co-located 让 SessionEngine 可以直接 `instanceof`-check + 调 `toTurnErrorCode`，不需要反向依赖 model-gateway）。concrete adapter 在 `packages/model-gateway/src/providers/`。架构 fitness 强制：
 
-- `packages/core` → `packages/model-gateway` 反向依赖**禁止**（core 拥有 port，adapter 依赖 core，不能反过来）。
+- `packages/core` → `packages/model-gateway` 反向依赖**禁止**。
 - `packages/schema` / `packages/storage` / `packages/permissions` → `packages/model-gateway` 同理禁止。
 
-barrel `@custom-agent/model-gateway` 当前导出：
+`@custom-agent/core` 与 `@custom-agent/model-gateway` 都导出同一份 `ProviderError`、`toTurnErrorCode`——后者是前者的薄 re-export，runtime 类身份一致，`instanceof` 跨 barrel 工作。adapter 作者按 ergonomics 从任一 barrel 导入皆可。
 
-- `ProviderError` 类层级（`ProviderRateLimit` / `ProviderUnauthorized` / `ProviderContextOverflow` / `ProviderServerError` / `ProviderUnknownError`）。
-- `toTurnErrorCode(error)` 把 ProviderError 翻成 schema 的 `TurnErrorCode`。
-- `RecordedProvider` + `ProviderFixture` 形状。
+`@custom-agent/model-gateway` barrel 额外导出：
+
+- `RecordedProvider` + `ProviderFixture` / `RecordedProviderEvent` / `RecordedProviderError` 形状。
 
 ### `ProviderError` 错误归一化（M2-02a）
 
@@ -210,7 +210,12 @@ barrel `@custom-agent/model-gateway` 当前导出：
 - `ProviderContextOverflow` → `"context_overflow"`
 - 其余 → `"provider_failure"`
 
-> 当前 SessionEngine 还没接 `toTurnErrorCode`（throw 路径默认映射 `"unknown"`，集成测试已 pin 这点）。M2-02b 或单独 follow-up 会把它接上，让 rate-limit / 5xx 在 `turn.completed.payload.errorCode` 有可观测信号。
+SessionEngine 在 catch 路径里 `instanceof ProviderError ? toTurnErrorCode(error) : "unknown"`：
+
+- 真正的 `ProviderError` 子类按映射落 `errorCode`（rate_limit / unauthorized / server_error / unknown → `provider_failure`；context_overflow → `context_overflow`）。
+- 任何裸 `Error`（provider 适配器 bug、未包装的网络异常）落 `errorCode = "unknown"`，永不静默掩盖。
+
+集成测试 `packages/model-gateway/src/integration.test.ts` 同时 pin 两条路径：`ProviderRateLimit` throw → `provider_failure`，`ProviderContextOverflow` throw → `context_overflow`。
 
 ### `RecordedProvider`（M2-02a 离线 CI）
 
