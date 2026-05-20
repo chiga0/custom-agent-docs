@@ -2,7 +2,7 @@
 title: "Roadmap 状态中心"
 ---
 
-最后更新：2026-05-20
+最后更新：2026-05-20（M2 启动）
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -68,8 +68,7 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-
-_当前活跃工作表已清空：M1 全部 work item 完成 → review/refactor/handbook 收尾 → M2 启动。_
+| M2-01 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m2-01-provider-port` | 形式化 ModelProvider port（已存在）+ 增加 `preflightCheck` + SessionEngine 把 preflight 失败映射为 `turn.completed { stopReason: "error", errorCode: "context_overflow" }` + schema 加 `errorCode` 字段 + contract test | `core-session` + `schema-events` | 实现 → 本地 quality gate → 开 draft PR |
 
 ## 6. 推荐并行切分
 
@@ -94,7 +93,9 @@ _当前活跃工作表已清空：M1 全部 work item 完成 → review/refactor
 
 如果一个 PR 同时修改 `schema + core + storage + web`，它应被视为高冲突 PR，需要拆分或在本文件登记为独占工作。
 
-## 7. M1 工作项状态
+## 7. M1 / M2 工作项状态
+
+M1 全部 DONE（详见 §4 milestone 总览）：
 
 | Work ID   | Backlog 项                 | 状态    | 依赖               | 推荐 owner 类型    | 验收摘要                                                  |
 | --------- | -------------------------- | ------- | ------------------ | ------------------ | --------------------------------------------------------- |
@@ -106,6 +107,13 @@ _当前活跃工作表已清空：M1 全部 work item 完成 → review/refactor
 | M1-ACP-HTTP | ACP Streamable HTTP daemon | `DONE`  | M1-ACP-STDIO      | core agent         | merged to main (`2c3414f`) — apps/acp-daemon HTTP+SSE 网关 + 项目自有 transport spec + 1:1 子进程 + bearer auth + session GC + header/body sessionId 一致性 |
 | M1-WEB-01 | Web Event Timeline         | `DONE`  | M1-ACP-HTTP, M1-04 | web agent          | merged to main (`7f39c9f`) — Web client 通过 ACP daemon HTTP 渲染 live/replay；29 个新测试覆盖 transcript reducer、SSE 解析、wire shape、XSS 转义 |
 | M1-QA-01  | Golden Transcript Fixtures | `DONE`  | M1-01 初版 schema  | qa agent           | merged to main (`5cddb0c`) — packages/qa-fixtures（normalized projection + golden fixture + live/replay/fixture 三层等价断言） |
+
+M2 工作项：
+
+| Work ID | Backlog 项 | 状态 | 依赖 | 推荐 owner 类型 | 验收摘要 |
+| ------- | ---------- | ---- | ---- | --------------- | -------- |
+| M2-01 | Define Model Provider Port | `IN_PROGRESS` | M1-03 | core agent | M1-03 已落地 `ModelProvider` port（capabilities + ModelStreamEvent）。M2-01 形式化 + 增 `preflightCheck` + SessionEngine 把超限映射成 `turn.completed { stopReason: "error", errorCode: "context_overflow" }`（[[adr-0003]] §2）+ schema 加 `errorCode` 字段 + fake provider contract test |
+| M2-02 | First Real Provider | `TODO` | M2-01 | core/provider agent | 一个 provider adapter + fixture recording format + error normalization；network-disabled CI test |
 
 ## 8. 未开始队列
 
