@@ -101,6 +101,13 @@ type PermissionPolicy = {
 - ToolRouter（M3-02+）会 `await engine.requestPermission(...)`，根据 `outcome` 决定是否 invoke ToolExecutor。
 - ToolExecutor 不接受 `PermissionEngine` 引用，没有自己绕开的入口。
 - 架构 fitness 将在 M3-02 增加 `apps/* → packages/permissions` 之外的 tool 路径不允许调用 executor 的边界规则。
+- M3-01 acceptance "tool executor 不能绕过 permission result" 当前是 **结构性** 保证（`requestPermission` 返回 `Promise`，调用者拿不到 sync decision 来跳过事件提交）；M3-02 ToolRouter 落地后须补一个端到端测试，断言通往 executor 的唯一路径经过 `await engine.requestPermission(...)`。
+
+#### SessionEngine 接入约定（M3-02 wiring）
+
+`PermissionEngine.requestPermission` 不知道 `sessionId` / `turnId` — 它只接收 `toolName` / `risk` / `reason` 等工具上下文。事件 envelope 字段（`id` / `sessionId` / `turnId` / `sequence` / `timestamp` / `schemaVersion`）由 `PermissionEventSink` 适配器在写入 EventStore 时填。M3-02 ToolRouter 创建 sink 闭包时 capture 当前 turn 的 `sessionId` + `turnId`，组装成完整 `AgentEvent` 再 append。这样 engine 保持 session-agnostic，复用在 ACP 之外的场景也成立。
+
+`argsPreview` 上限 512 字符（engine 安全网），更精细的 redaction / 截断在 ToolRouter 层做。
 
 ## ToolExecutor 职责
 
