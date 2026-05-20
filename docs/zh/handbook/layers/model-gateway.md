@@ -94,6 +94,23 @@ M3 添加 `tool_call_delta` / `tool_call_completed`，M2-02 真实 provider 时�
 - 错误码进 schema，是 transcript projection 的可见字段，UI 可以显示"超出上下文窗口"友好提示。
 - M2-02 真实 provider 适配时只需要正确实现 `preflightCheck` + 厂商 tokenizer，不需要改 SessionEngine 的状态机。
 
+### 已知 wire-surface 限制（M2-01 → M2-02 衔接）
+
+M2-01 让 `errorCode` 落到 `AgentEvent.payload`，但**还没**让它穿过 ACP wire：
+
+- `apps/acp-server/src/event-mapper.ts` 对 `turn.completed` 返回 `null`（按 ACP 规范，turn 的最终状态通过 `PromptResponse.stopReason` 表达而不是 `session/update`）。
+- `mapStopReason` 把 core 的 `"error"` 翻成 ACP `"refusal"`，丢弃 `errorCode`。
+
+后果：M2-01 的 errorCode **仅**可在事件日志 replay（`session/load`）和 acp-server `stderr` 诊断日志中看到，ACP `PromptResponse` 仍然只有 `stopReason: "refusal"`。
+
+M2-02 真实 provider 接入时必须修这个 wire 间隙：
+
+- 选项 (a)：在 ACP `SessionUpdate` 联合上加一个 `turn_error` 变体（需要 schema + mapper + web client + daemon 测试一起改）。
+- 选项 (b)：让 `PromptResponse.stopReason` 引入新值 `"context_overflow"` —— 与 Zed ACP 规范偏离，需要先开 ADR。
+- 选项 (c)：维持现状，客户端通过 `session/load` 后读 `turn.completed` payload 获取 errorCode —— 不增加 wire 表面，但要求所有想看 errorCode 的客户端实现 replay 路径。
+
+M2-02 author 选择哪条之前不应该误以为 M2-01 已经把错误码暴露给客户端。
+
 ## Capability Model
 
 不要靠 if provider name 判断行为，应该声明能力：
