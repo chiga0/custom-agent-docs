@@ -68,7 +68,9 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-_当前活跃工作表已清空：M2-01 已完成 Round 1 + Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-20 条目）。_
+| Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
+| ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
+| M2-02a | `IN_PROGRESS` | Claude Opus 4.7 | branch `m2-02a-recorded-provider` | 新建 `packages/model-gateway/`；RecordedProvider（读 JSONL fixture，离线 CI）；ProviderError 错误归一化；handbook M2-02a 段。**不**装真 SDK；真 SDK adapter 留给 M2-02b | `core-session` + `schema-events`（leaf 包，不动 core） | 实现 → 本地 quality gate → 开 draft PR |
 
 ## 6. 推荐并行切分
 
@@ -113,7 +115,8 @@ M2 工作项：
 | Work ID | Backlog 项 | 状态 | 依赖 | 推荐 owner 类型 | 验收摘要 |
 | ------- | ---------- | ---- | ---- | --------------- | -------- |
 | M2-01 | Define Model Provider Port | `DONE` | M1-03 | core agent | merged to main (`d314c65`) — `preflightCheck` + `PreflightResult` + SessionEngine 把超限映射成 `turn.completed { stopReason: "error", errorCode: "context_overflow" }` + schema `TurnErrorCode` + fake provider contract test（21 files / 187 tests） |
-| M2-02 | First Real Provider | `READY` | M2-01 | core/provider agent | 一个 provider adapter + fixture recording format + error normalization；network-disabled CI test。**已知前置：** M2-01 errorCode 仅落 event log；M2-02 需先决定 wire 暴露方案（handbook model-gateway 列出 3 个选项） |
+| M2-02a | Model Gateway scaffold + RecordedProvider | `IN_PROGRESS` | M2-01 | core/provider agent | 拆自原 M2-02。新 `packages/model-gateway/` + RecordedProvider（fixture-replay，离线 CI）+ ProviderError normalize 起点。**不**装真 SDK |
+| M2-02b | First Real Provider Adapter | `TODO` | M2-02a | core/provider agent | 真 SDK 适配（Anthropic / OpenAI / 其他）；fixture recording 工具；真 SDK 错误 → ProviderError 翻译。**前置决定：** errorCode 上 wire 方案（handbook model-gateway "已知 wire-surface 限制" 3 选项） |
 
 ## 8. 未开始队列
 
