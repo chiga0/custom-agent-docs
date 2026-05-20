@@ -67,8 +67,7 @@ title: "Roadmap 状态中心"
 
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-
-_当前活跃工作表已清空：M1-04 已完成 Round 1 + Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-20 条目）。_
+| M1-WEB-01 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-web-01-event-timeline` | Web client 通过 ACP daemon HTTP 拉取 live/replayed event stream：daemon 连接配置 + session/new + session/load + session/prompt + SSE 订阅 + transcript 渲染 | `web-timeline` | 实现 → 本地 quality gate → 开 draft PR |
 
 ## 6. 推荐并行切分
 
@@ -103,7 +102,7 @@ _当前活跃工作表已清空：M1-04 已完成 Round 1 + Round 2 self-review 
 | M1-04     | Replay API                 | `DONE`  | M1-01, M1-03, M1-ACP-HTTP | core/storage agent | merged to main (`ac22643`) — ACP `session/load` over Streamable HTTP：acp-server loadSession + 共享 event log root + acp-daemon 路由 + live≡replay 等价 smoke |
 | M1-ACP-STDIO | ACP stdio server         | `DONE` | M1-01, M1-03       | core agent         | merged to main (`d005879`) — official Zed ACP SDK stdio server + schema subpath + 69 tests |
 | M1-ACP-HTTP | ACP Streamable HTTP daemon | `DONE`  | M1-ACP-STDIO      | core agent         | merged to main (`2c3414f`) — apps/acp-daemon HTTP+SSE 网关 + 项目自有 transport spec + 1:1 子进程 + bearer auth + session GC + header/body sessionId 一致性 |
-| M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
+| M1-WEB-01 | Web Event Timeline         | `IN_PROGRESS` | M1-ACP-HTTP, M1-04 | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
 | M1-QA-01  | Golden Transcript Fixtures | `DONE`  | M1-01 初版 schema  | qa agent           | merged to main (`5cddb0c`) — packages/qa-fixtures（normalized projection + golden fixture + live/replay/fixture 三层等价断言） |
 
 ## 8. 未开始队列
