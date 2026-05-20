@@ -70,7 +70,7 @@ title: "Roadmap 状态中心"
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
 | Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
 | ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
-| M3-02 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m3-02-readonly-tools` | 新建 `packages/tools/`；`Tool` port + `ToolRouter`（接 PermissionEngine + 发 4 类 `tool.*` 事件）+ 3 个工具 `read_file` / `list_files` / `search_text`；路径安全 + 输出预算。**延后**：gitignore 解析、SessionEngine 接 ToolRouter（M3-02b）| `schema-events` + 新 `tools` | 实现 → 本地 quality gate → 开 draft PR |
+_当前活跃工作表已清空：M3-02 已完成 Round 1 + Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-20 条目）。_
 
 ## 6. 推荐并行切分
 
@@ -123,7 +123,7 @@ M3 工作项：
 | Work ID | Backlog 项 | 状态 | 依赖 | 推荐 owner 类型 | 验收摘要 |
 | ------- | ---------- | ---- | ---- | --------------- | -------- |
 | M3-01 | Permission Engine | `DONE` | M1-03 | core/permissions agent | merged to main (`6288cd7`) — PermissionEngine + DEFAULT_POLICY + ApprovalSource + EventSink + 2 个 schema 事件类型；24 files / 222 tests |
-| M3-02 | Read/Search Tools (a) | `IN_PROGRESS` | M3-01 | core agent | `read_file` / `list_files` / `search_text` + ToolRouter 接 PermissionEngine + 4 类 `tool.*` 事件 + 输出预算 + 路径安全。**延后到 M3-02b**：gitignore + SessionEngine 模型循环接 ToolRouter |
+| M3-02 | Read/Search Tools (a) | `DONE` | M3-01 | core agent | merged to main (`c7aa2fe`) — 新 `packages/tools/` + Tool port + ToolRouter + 3 个工具 + 4 类 `tool.*` 事件 + path safety + 64 KiB 输出预算 + 顺序保留 delta chain；30 files / 268 tests |
 | M3-02b | Tools wire into SessionEngine | `TODO` | M3-02 + M2-02b | core agent | 模型 tool-use 协议解析（Anthropic / OpenAI tool_use）→ ToolRouter → 结果回喂模型；Web event timeline 展示 tool.* 事件；gitignore 解析 |
 | M3-03 | Shell Tool | `TODO` | M3-01 | core agent | 受 PermissionEngine 守护的 shell 调用 |
 
@@ -244,6 +244,7 @@ PR 关闭或放弃后：
 | 2026-05-20 | M2-01 Model Provider Port self-review 双轮 + admin merge | 同流程：claim → 实现（schema TurnErrorCode + ModelProvider.preflightCheck + FakeStreamingProvider 实现 + SessionEngine preflight 失败映射 turn.completed errorCode + 11 个新测试）→ Round 1 self-review（0 P1 + 3 P2 + 3 P3）→ patch（schema additive evolution guards + handbook 记 wire-surface 限制 disposition 给 M2-02）→ Round 2 PASS → admin merge | PR #11 → main (`d314c65`)；handbook docs main (`3627c4a`)；M2-01 DONE，M2-02 READY 待选 errorCode 上 wire 方案 |
 | 2026-05-20 | M2-02 拆 a/b + M2-02a self-review 双轮 + admin merge | 原 M2-02 "first real provider" 拆为 M2-02a（架构 scaffold + RecordedProvider，离线 CI）+ M2-02b（真 SDK adapter，留给后续 PR）。M2-02a：新 `packages/model-gateway/`、ProviderError 5 类层级、`toTurnErrorCode`、RecordedProvider with `failBefore/failWith` 注入；Round 1 P2 #1 触发 ProviderError 从 model-gateway 迁回 `packages/core/src/ports/`，SessionEngine catch 路径直接 instanceof + toTurnErrorCode（rate_limit → provider_failure，context_overflow → context_overflow）；handbook 更新 | PR #12 → main (`c34a986`)；handbook docs main (`def0a46`)；M2-02a DONE，M2-02b READY 待选真 SDK + wire 方案 |
 | 2026-05-20 | M3-01 PermissionEngine self-review 双轮 + admin merge | 同流程：claim → 实现（schema 加 ToolPermission{Requested,Resolved}Event + ToolRisk/PermissionDecision/Outcome 类型 + PermissionEngine class with byTool > byRisk > defaultDecision policy + Promise-return-shape 防 bypass + ApprovalSource/EventSink 注入 ports + 16 个新测试）→ Round 1 self-review（0 P1 + 4 P2 + 3 P3）→ patch（PermissionEventInput 改用 Pick<schema event> 派生 + argsPreview 512 字符截断防 audit DoS + handbook 记 SessionEngine wiring 约定）→ Round 2 PASS → admin merge | PR #13 → main (`6288cd7`)；handbook docs main (`8eecd83`)；M3-01 DONE，M3-02 Read/Search Tools READY（需要构建 ToolRouter 走 PermissionEngine）|
+| 2026-05-20 | M3-02 拆 + 主 PR self-review 双轮 + admin merge | M3-02 拆分：本 PR 落 tools + ToolRouter + 3 read-only 工具 + 4 类 tool.* 事件；M3-02b 延后接 SessionEngine 模型循环 + gitignore。**主 PR**：schema 加 ToolStarted/Delta/Completed/Failed + ToolErrorCode 联合；新 `packages/tools/` 含 Tool port、ToolRouter（PermissionEngine gate + 4 lifecycle 事件 + UTF-8-safe 64 KiB BudgetAccumulator + resolveInsideCwd 含 sibling-prefix 攻击防御）、read_file/list_files/search_text；架构 fitness 加 5 条 forbidden edges（tools 是 leaf）；45 个新测试。Round 1 self-review（0 P1 + 4 P2 + 4 P3）→ patch（最关键：delta emit 改成顺序保留 promise chain + drain-before-terminal，防 fire-and-forget 导致 completed 跑赢 delta；handbook ToolRisk drift 修正）→ Round 2 PASS → admin merge | PR #14 → main (`c7aa2fe`)；handbook docs main (`a8955f1`)；M3-02 DONE，M3-02b 等 M2-02b 真 provider 落地后启动模型循环工作 |
 
 ## 13. 更新检查清单
 
