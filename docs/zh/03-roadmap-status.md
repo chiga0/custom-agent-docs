@@ -65,11 +65,10 @@ title: "Roadmap 状态中心"
 
 ## 5. 当前活跃工作
 
-| Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
-| ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
-| Work ID | 状态     | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
-| ------- | -------- | ----------- | --------- | ---- | ------ | ------ |
-| M1-04 | `IN_PROGRESS` | Claude Opus 4.7 | branch `m1-04-replay-api` | ACP `session/load` over Streamable HTTP：acp-server `loadSession` + 共享 event log root（`ACP_EVENT_LOG_ROOT`）+ acp-daemon 路由 + replay/live 等价测试 | `apps-acp` + `core-session` | 实现 → 本地 quality gate → 开 draft PR |
+| Work ID | 状态 | Owner/Agent | Branch/PR | 范围 | 冲突域 | 下一步 |
+| ------- | ---- | ----------- | --------- | ---- | ------ | ------ |
+
+_当前活跃工作表已清空：M1-04 已完成 Round 1 + Round 2 self-review PASS 并由维护者直接 admin-merge（详见 §12 决策日志 2026-05-20 条目）。_
 
 ## 6. 推荐并行切分
 
@@ -101,7 +100,7 @@ title: "Roadmap 状态中心"
 | M1-01     | Append-Only Event Log      | `DONE`  | M0-03              | storage agent      | merged to main (`e0cf5aa`) — JSONL event log + replay     |
 | M1-02     | Session Index              | `DONE`  | M1-01              | storage agent      | merged to main (`aadeb8b`) — SQLite session/turn index + JSONL rebuild |
 | M1-03     | Fake Provider Turn         | `DONE`  | M1-01              | core agent         | merged to main (`34501d7`) — SessionEngine + fake streaming provider |
-| M1-04     | Replay API                 | `IN_PROGRESS` | M1-01, M1-03, M1-ACP-HTTP | core/storage agent | ACP Streamable HTTP `session/load` 子集；详见 [[adr-0004]] |
+| M1-04     | Replay API                 | `DONE`  | M1-01, M1-03, M1-ACP-HTTP | core/storage agent | merged to main (`ac22643`) — ACP `session/load` over Streamable HTTP：acp-server loadSession + 共享 event log root + acp-daemon 路由 + live≡replay 等价 smoke |
 | M1-ACP-STDIO | ACP stdio server         | `DONE` | M1-01, M1-03       | core agent         | merged to main (`d005879`) — official Zed ACP SDK stdio server + schema subpath + 69 tests |
 | M1-ACP-HTTP | ACP Streamable HTTP daemon | `DONE`  | M1-ACP-STDIO      | core agent         | merged to main (`2c3414f`) — apps/acp-daemon HTTP+SSE 网关 + 项目自有 transport spec + 1:1 子进程 + bearer auth + session GC + header/body sessionId 一致性 |
 | M1-WEB-01 | Web Event Timeline         | `READY` | 初始 event fixture | web agent          | Web 可展示 live/replayed event stream（通过 ACP daemon）  |
@@ -218,6 +217,7 @@ PR 关闭或放弃后：
 | 2026-05-18 | M1-ACP-STDIO 合入 main | PR #5 通过 Codex Round 3 mainline-guardian PASS；merge SHA `d005879` | ACP stdio canonical wire 完成；M1-ACP-HTTP 可 rebase main 并推进 ready review |
 | 2026-05-19 | M1-ACP-HTTP rebase 完成 + promote ready | PR #6 rebase 到 main（单 commit `b5bc812` 在 `d005879` 之上），本地 quality gate 全绿（15 files / 116 tests），base 已切到 main | M1-ACP-HTTP 进入 REVIEW；等 cross-reviewer Round 2 PASS → admin merge |
 | 2026-05-19 | M1-ACP-HTTP / M1-QA-01 self-review 双轮 + admin merge | 维护者 explicit 授权，跳过 cross-reviewer：(a) Round 1 self-review 发到 thread（P1 + P2 + P3）；(b) 在 branch 上落地全部 P1 + 主要 P2 + 关键 P3 patch；(c) Round 2 self-review PASS；(d) `gh pr merge --admin` 依次合入 | PR #6 → main (`2c3414f`)，PR #7 → main (`5cddb0c`)；M1 实质完成 ACP 双 transport + golden 回归基础设施。M1 剩余主项：M1-04 Replay API、M1-WEB-01 Web Event Timeline |
+| 2026-05-20 | M1-04 self-review 双轮 + admin merge | 同维护者授权流程：claim → 实现（acp-server loadSession + 共享 event log root + acp-daemon session/load 路由 + SPEC.md §4/§6.2 + 12 个测试包括 live≡replay smoke）→ Round 1 self-review（0 P1 + 4 P2 + 3 P3）→ patch（eager-GC、stderr observability、registerSession helper、additionalDirectories void、import cleanup）→ Round 2 PASS → admin merge | PR #8 → main (`ac22643`)；M1 剩余主项仅 M1-WEB-01；M1 wire 层全部完成 |
 
 ## 13. 更新检查清单
 
