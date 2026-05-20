@@ -39,34 +39,60 @@ Model Gateway 不应该：
 
 ## Provider Port
 
+M1-03 落地的 minimal shape（`packages/core/src/ports/model-provider.ts`）：
+
 ```ts
 type ModelProvider = {
   id: string;
   capabilities: ModelCapabilities;
+  preflightCheck(request: ModelRequest): PreflightResult;     // M2-01
   stream(
     request: ModelRequest,
     signal: AbortSignal,
   ): AsyncIterable<ModelStreamEvent>;
 };
+
+type PreflightResult =
+  | { ok: true; estimatedTokens: number }
+  | {
+      ok: false;
+      reason: "context_overflow";
+      estimatedTokens: number;
+      maxContextTokens: number;
+    };
 ```
 
-`ModelRequest` 应该包含：
+`ModelRequest`（M1 最小集）：
 
-- messages。
-- tools schema。
-- model id。
-- temperature / reasoning / max tokens。
-- metadata。
+- `modelId`
+- `messages: { role, content }[]`
+- `metadata?` — provider-specific 透传字段
 
-`ModelStreamEvent` 应该包含：
+M3+ 会扩展到 tools schema / temperature / reasoning budget；当前 port 故意保持最小。
+
+`ModelStreamEvent` 联合体（M1 最小集）：
 
 - `text_delta`
-- `reasoning_delta`
-- `tool_call_delta`
-- `tool_call_completed`
-- `usage`
-- `completed`
-- `failed`
+- `completed`（带 `usage`）
+- `failed`（带 `reason`）
+
+M3 添加 `tool_call_delta` / `tool_call_completed`，M2-02 真实 provider 时按需添加 `reasoning_delta` / `usage` 中间帧。
+
+### Preflight 契约（[[adr-0003]] §2 / M2-01）
+
+`preflightCheck` 必须：
+
+- 同步（或近同步）— 在 turn 每次 runTurn 前都会跑，必须 cheap。
+- 离线 — **不可** 触网；用 provider 自己的 tokenizer 或保守的字符近似（fake provider 用 4 字符≈1 token 的启发式）。
+- 把 `request.messages` 的 token 估算与 `capabilities.maxContextTokens` 比较；超限时返回 `{ ok: false, reason: "context_overflow", … }`。
+
+**SessionEngine 失败映射规则：** preflight 返回 `ok: false` 时，**不抛异常**，直接发 `turn.completed { stopReason: "error", errorCode: "context_overflow" }` 并 return。也就是说 turn 仍然是"开始→失败终止"的完整生命周期，replay 看到的也是同样的事件序列。
+
+这条规则的意义：
+
+- 调用方（acp-server / web client）永远只看到 `turn.completed` 作为终止事件，不会出现"抛异常然后 PromptResponse hang/5xx"。
+- 错误码进 schema，是 transcript projection 的可见字段，UI 可以显示"超出上下文窗口"友好提示。
+- M2-02 真实 provider 适配时只需要正确实现 `preflightCheck` + 厂商 tokenizer，不需要改 SessionEngine 的状态机。
 
 ## Capability Model
 
@@ -103,51 +129,49 @@ type ModelProvider = {
 - Usage summary。
 - Error normalization。
 
-### Fake Provider (M1-03)
+### Fake Provider (M1-03 + M2-01)
 
-M1-03 阶段引入的 fake provider 用于让 SessionEngine 端到端跑通 turn 状态机，
-不接真实模型。
-
-参考实现形态：
+实际落地在 `packages/core/src/providers/fake-provider.ts`。M1-03 引入；M2-01 补 `preflightCheck` 实现。
 
 ```ts
-// packages/core/src/providers/fake-provider.ts (或类似)
 export class FakeStreamingProvider implements ModelProvider {
-  id = "fake-streaming";
-  capabilities: ModelCapabilities = {
-    streaming: true,
-    toolCall: false,
-    parallelToolCall: false,
-    reasoning: false,
-    maxContextTokens: 8_000,
-  };
+  readonly id = "fake-streaming";
+  readonly capabilities: ModelCapabilities; // maxContextTokens via ctor opts
 
-  // chunks 可以来自构造参数，便于测试断言；缺省回固定文本
-  constructor(private readonly chunks: readonly string[] = ["Project ", "spine ", "is ", "ready."]) {}
+  preflightCheck(request: ModelRequest): PreflightResult {
+    const chars = request.messages.reduce((a, m) => a + m.content.length, 0);
+    const est = Math.ceil(chars / 4); // 4 chars/token heuristic
+    return est > this.capabilities.maxContextTokens
+      ? { ok: false, reason: "context_overflow", estimatedTokens: est, maxContextTokens: this.capabilities.maxContextTokens }
+      : { ok: true, estimatedTokens: est };
+  }
 
-  async *stream(
-    request: ModelRequest,
-    signal: AbortSignal,
-  ): AsyncIterable<ModelStreamEvent> {
-    for (const text of this.chunks) {
-      if (signal.aborted) {
-        yield { type: "failed", reason: "aborted" };
-        return;
-      }
-      // 模拟流式延迟；测试里建议传 0 以保持快速
-      yield { type: "text_delta", delta: text };
+  async *stream(_req: ModelRequest, signal: AbortSignal): AsyncIterable<ModelStreamEvent> {
+    for (const delta of this.chunks) {
+      if (signal.aborted) { yield { type: "failed", reason: "aborted" }; return; }
+      yield { type: "text_delta", delta };
     }
     yield { type: "completed", usage: { promptTokens: 0, completionTokens: 0 } };
   }
 }
 ```
 
-关键契约：
+关键契约（contract test 在 `fake-provider.test.ts` 8 个用例锁定）：
 
-- `stream` **必须** 是 AsyncGenerator (`async *`)，不能返回 Promise<Array> 然后伪装成 iterable。
-- 任意时刻 `signal.aborted === true` 时，应在下一个 yield 前结束，并发一条 `type: "failed"` 或直接 return。SessionEngine 据此把 turn 标记为 cancelled。
-- fake provider 不应该写 event log；它只 yield ModelStreamEvent，由 SessionEngine 决定哪些转译成 AgentEvent。
-- 测试用 fake provider 时，应提供可控制的 `chunks`（输入 N，预期 N 条 `model.delta`），让 turn 状态机的 golden test 稳定。
+- `stream` 必须是 `async *` AsyncGenerator。
+- `signal.aborted === true` 时立即终止并 yield `failed/aborted`；SessionEngine 据此把 turn 标 cancelled。
+- `preflightCheck` 不触网、不抛、对超限场景返回 `ok: false`。
+- fake provider 不写 event log；只 yield `ModelStreamEvent`，由 SessionEngine 决定哪些翻成 `AgentEvent`。
+- 测试构造时建议显式传 `chunks` + `maxContextTokens`，让 golden / preflight 失败用例确定性可控。
+
+### M2-02 真实 Provider 适配（TODO）
+
+新 provider 应该：
+
+1. 复用厂商官方 SDK 做 HTTP / SSE / 鉴权。
+2. 在 adapter 内部 tokenize 一次，把 `preflightCheck` 接到真 tokenizer（避免重新发明字符近似）。
+3. 在 `stream` 内部把厂商原生 chunk 翻译成 `ModelStreamEvent`，特别注意：错误（包括 rate limit / 5xx）必须翻成 `failed` event 或抛 typed error，不能让 SessionEngine 收到原生 SDK 异常。
+4. 记录 fixture（请求 + 响应）以便 network-disabled CI replay。
 
 ## 成熟实现
 
