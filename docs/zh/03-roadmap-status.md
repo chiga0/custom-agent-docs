@@ -2,7 +2,7 @@
 title: "Roadmap 状态中心"
 ---
 
-最后更新：2026-06-04（M5 DONE，准备 M6）
+最后更新：2026-06-04（M6 DONE，准备 M7）
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -21,15 +21,15 @@ title: "Roadmap 状态中心"
 
 ## 2. 当前阶段
 
-当前阶段：`M6: MCP Stdio` — M0–M5 全部 DONE，进入 M6。
+当前阶段：`M7: MCP Resources and Prompts` — M0–M6 全部 DONE，进入 M7。
 
 阶段状态：`READY`
 
 说明：
 
-- `M0–M4` 已完成（event core + model gateway + tools + context/compaction）。
-- `M5: Skills` 已完成：SkillRegistry port + FsSkillRegistry + skill.loaded event + allowed_tools enforcement + lazy body loading。
-- 下一阶段是 `M6: MCP Stdio`。
+- `M0–M5` 已完成。
+- `M6: MCP Stdio` 已完成：McpServerManager + stdio transport + tool namespacing + include/exclude filter + McpToolBridge（default risk "network"）+ state tracking。
+- 下一阶段是 `M7: MCP Resources and Prompts`。
 
 ## 3. 状态定义
 
@@ -54,8 +54,8 @@ title: "Roadmap 状态中心"
 | M3 Local Tools and Permission Engine    | `DONE`     | PermissionEngine + 6 tools + tool-use loop + Web UI | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
 | M4 Context, Instructions and Compaction | `DONE`     | InstructionSource + ContextBuilder + 滑动窗口压缩 + context.budget 事件 | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
 | M5 Skills                               | `DONE`     | SkillRegistry + FsSkillRegistry + allowed_tools enforcement | [Roadmap](02-roadmap.md#m5skills)                                    |
-| M6 MCP Stdio                            | `READY`    | Tool router/permission engine 已成型，可开工     | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
-| M7 MCP Resources, Prompts and HTTP      | `TODO`     | 等 M6 完成                                       | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
+| M6 MCP Stdio                            | `DONE`     | McpServerManager + tool namespacing + bridge + state tracking | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
+| M7 MCP Resources, Prompts and HTTP      | `READY`    | M6 完成，可开工                                  | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
 | M8 ACP Production Hardening             | `TODO`     | 等 M1-ACP-* + M2-M7 闭环；改名见 [[adr-0004]]    | [Roadmap](02-roadmap.md#m8acp-production-hardening)                  |
 | M9a Security Hardening                  | `TODO`     | 拆自原 M9，与 9b/9c 可并行                       | [Roadmap](02-roadmap.md#m9asecurity-hardening)                       |
 | M9b Production Ops                      | `TODO`     | 拆自原 M9                                        | [Roadmap](02-roadmap.md#m9bproduction-ops)                           |
