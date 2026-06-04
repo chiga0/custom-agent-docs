@@ -2,7 +2,7 @@
 title: "Roadmap 状态中心"
 ---
 
-最后更新：2026-05-20（M2 启动）
+最后更新：2026-05-29（M2、M3 全部 DONE，准备 M4）
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -21,16 +21,17 @@ title: "Roadmap 状态中心"
 
 ## 2. 当前阶段
 
-当前阶段：`M1: Event-Sourced Session Core` — 全部 work item DONE，准备移交至 review/refactor/handbook 收尾阶段，然后开启 `M2: Model Gateway`。
+当前阶段：`M4: Context, Instructions and Compaction` — M0–M3 全部 DONE，进入 M4。
 
-阶段状态：`DONE`（最后一个 work item M1-WEB-01 于 2026-05-20 合入 main，merge SHA `7f39c9f`）
+阶段状态：`READY`
 
 说明：
 
-- `M0: Project Spine and Governance` 已完成 bootstrap。
-- `M1` 实质完成：append-only event log + SQLite session index + SessionEngine + ACP stdio/HTTP 双 transport + session/load replay + golden 回归 fixture + Web event timeline。
-- 下一阶段是 `M2: Model Gateway` — 在 M1 review/refactor/handbook 收尾后启动。
-- `M2+` 暂不并行实现，除非先完成对应 ADR 并确认不会扰动 M1 event/session 边界。
+- `M0: Project Spine and Governance` 已完成。
+- `M1: Event-Sourced Session Core` 已完成。
+- `M2: Model Gateway` 已完成：Provider Port + RecordedProvider + AnthropicProvider 真实适配器 + usage 回传链路。
+- `M3: Local Tools and Permission Engine` 已完成：PermissionEngine + ToolRouter + read_file/list_files/search_text/shell/git_diff/apply_patch + gitignore 解析 + 模型 tool-use loop + Web tool cards/diff viewer。
+- 下一阶段是 `M4: Context, Instructions and Compaction`。
 
 ## 3. 状态定义
 
@@ -51,9 +52,9 @@ title: "Roadmap 状态中心"
 | --------------------------------------- | ---------- | ------------------------------------------------ | -------------------------------------------------------------------- |
 | M0 Project Spine and Governance         | `DONE`     | 初始化完成，后续只做补强                         | [Backlog](07-implementation-backlog.md#m0项目骨架)                   |
 | M1 Event-Sourced Session Core           | `DONE`     | 全部 work item 合入 main；进入 review/refactor/handbook 收尾 | [Roadmap](02-roadmap.md#m1event-sourced-session-core)                |
-| M2 Model Gateway                        | `READY`    | M1 wire 完成，event/session 边界稳定，可开工     | [Roadmap](02-roadmap.md#m2model-gateway)                             |
-| M3 Local Tools and Permission Engine    | `TODO`     | 等 M1 session/event 与 M2 provider port 初步稳定 | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
-| M4 Context, Instructions and Compaction | `TODO`     | 等 M1-M3 基础能力成型                            | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
+| M2 Model Gateway                        | `DONE`     | AnthropicProvider 适配 + usage 回传 + RecordedProvider | [Roadmap](02-roadmap.md#m2model-gateway)                             |
+| M3 Local Tools and Permission Engine    | `DONE`     | PermissionEngine + 6 tools + tool-use loop + Web UI | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
+| M4 Context, Instructions and Compaction | `READY`    | M1-M3 基础能力已成型，可开工                     | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
 | M5 Skills                               | `TODO`     | 等 context builder 成型                          | [Roadmap](02-roadmap.md#m5skills)                                    |
 | M6 MCP Stdio                            | `TODO`     | 等 tool router/permission engine 成型            | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
 | M7 MCP Resources, Prompts and HTTP      | `TODO`     | 等 M6 完成                                       | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
@@ -114,7 +115,7 @@ M2 工作项：
 | ------- | ---------- | ---- | ---- | --------------- | -------- |
 | M2-01 | Define Model Provider Port | `DONE` | M1-03 | core agent | merged to main (`d314c65`) — `preflightCheck` + `PreflightResult` + SessionEngine 把超限映射成 `turn.completed { stopReason: "error", errorCode: "context_overflow" }` + schema `TurnErrorCode` + fake provider contract test（21 files / 187 tests） |
 | M2-02a | Model Gateway scaffold + RecordedProvider | `DONE` | M2-01 | core/provider agent | merged to main (`c34a986`) — 新 `packages/model-gateway/` + RecordedProvider + ProviderError taxonomy（co-located 在 core ports）+ SessionEngine 接 toTurnErrorCode；24 files / 205 tests |
-| M2-02b | First Real Provider Adapter | `READY` | M2-02a | core/provider agent | 真 SDK 适配（Anthropic / OpenAI / 其他）；fixture recording 工具；真 SDK 错误 → ProviderError 翻译。**前置决定：** errorCode 上 wire 方案（handbook model-gateway "已知 wire-surface 限制" 3 选项） |
+| M2-02b | First Real Provider Adapter | `DONE` | M2-02a | core/provider agent | merged to main (`73b070b`) — AnthropicProvider adapter + Messages API streaming + usage 回传 + ProviderError 翻译 |
 
 M3 工作项：
 
@@ -122,8 +123,8 @@ M3 工作项：
 | ------- | ---------- | ---- | ---- | --------------- | -------- |
 | M3-01 | Permission Engine | `DONE` | M1-03 | core/permissions agent | merged to main (`6288cd7`) — PermissionEngine + DEFAULT_POLICY + ApprovalSource + EventSink + 2 个 schema 事件类型；24 files / 222 tests |
 | M3-02 | Read/Search Tools (a) | `DONE` | M3-01 | core agent | merged to main (`c7aa2fe`) — 新 `packages/tools/` + Tool port + ToolRouter + 3 个工具 + 4 类 `tool.*` 事件 + path safety + 64 KiB 输出预算 + 顺序保留 delta chain；30 files / 268 tests |
-| M3-02b | Tools wire into SessionEngine | `TODO` | M3-02 + M2-02b | core agent | 模型 tool-use 协议解析（Anthropic / OpenAI tool_use）→ ToolRouter → 结果回喂模型；Web event timeline 展示 tool.* 事件；gitignore 解析 |
-| M3-03 | Shell Tool | `TODO` | M3-01 | core agent | 受 PermissionEngine 守护的 shell 调用 |
+| M3-02b | Tools wire into SessionEngine | `DONE` | M3-02 + M2-02b | core agent | merged to main (PR #15 `65a2e69` + PR #17 `618aa27`) — tool-use loop in SessionEngine + ToolCallHandler port + gitignore 解析 + Web tool cards/diff viewer + usage accounting |
+| M3-03 | Shell Tool | `DONE` | M3-01 | core agent | merged to main (PR #15 `65a2e69`) — shell executor + denylist risk classifier + timeout/abort + PermissionEngine 守护 |
 
 ## 8. 未开始队列
 
