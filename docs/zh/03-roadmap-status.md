@@ -2,7 +2,7 @@
 title: "Roadmap 状态中心"
 ---
 
-最后更新：2026-06-04（M4 DONE，准备 M5）
+最后更新：2026-06-04（M5 DONE，准备 M6）
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -21,18 +21,15 @@ title: "Roadmap 状态中心"
 
 ## 2. 当前阶段
 
-当前阶段：`M5: Skills` — M0–M4 全部 DONE，进入 M5。
+当前阶段：`M6: MCP Stdio` — M0–M5 全部 DONE，进入 M6。
 
 阶段状态：`READY`
 
 说明：
 
-- `M0: Project Spine and Governance` 已完成。
-- `M1: Event-Sourced Session Core` 已完成。
-- `M2: Model Gateway` 已完成：Provider Port + RecordedProvider + AnthropicProvider 真实适配器 + usage 回传链路。
-- `M3: Local Tools and Permission Engine` 已完成：PermissionEngine + ToolRouter + 6 tools + gitignore + tool-use loop + Web tool cards/diff viewer。
-- `M4: Context, Instructions and Compaction` 已完成：InstructionSource port + FsInstructionSource + ContextBuilder（滑动窗口压缩）+ cross-turn conversationHistory + context.budget/session.compacted 事件。
-- 下一阶段是 `M5: Skills`。
+- `M0–M4` 已完成（event core + model gateway + tools + context/compaction）。
+- `M5: Skills` 已完成：SkillRegistry port + FsSkillRegistry + skill.loaded event + allowed_tools enforcement + lazy body loading。
+- 下一阶段是 `M6: MCP Stdio`。
 
 ## 3. 状态定义
 
@@ -56,8 +53,8 @@ title: "Roadmap 状态中心"
 | M2 Model Gateway                        | `DONE`     | AnthropicProvider 适配 + usage 回传 + RecordedProvider | [Roadmap](02-roadmap.md#m2model-gateway)                             |
 | M3 Local Tools and Permission Engine    | `DONE`     | PermissionEngine + 6 tools + tool-use loop + Web UI | [Roadmap](02-roadmap.md#m3local-tools-与-permission-engine)          |
 | M4 Context, Instructions and Compaction | `DONE`     | InstructionSource + ContextBuilder + 滑动窗口压缩 + context.budget 事件 | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
-| M5 Skills                               | `TODO`     | 等 context builder 成型                          | [Roadmap](02-roadmap.md#m5skills)                                    |
-| M6 MCP Stdio                            | `TODO`     | 等 tool router/permission engine 成型            | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
+| M5 Skills                               | `DONE`     | SkillRegistry + FsSkillRegistry + allowed_tools enforcement | [Roadmap](02-roadmap.md#m5skills)                                    |
+| M6 MCP Stdio                            | `READY`    | Tool router/permission engine 已成型，可开工     | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
 | M7 MCP Resources, Prompts and HTTP      | `TODO`     | 等 M6 完成                                       | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
 | M8 ACP Production Hardening             | `TODO`     | 等 M1-ACP-* + M2-M7 闭环；改名见 [[adr-0004]]    | [Roadmap](02-roadmap.md#m8acp-production-hardening)                  |
 | M9a Security Hardening                  | `TODO`     | 拆自原 M9，与 9b/9c 可并行                       | [Roadmap](02-roadmap.md#m9asecurity-hardening)                       |
