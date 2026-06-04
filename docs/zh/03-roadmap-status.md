@@ -2,7 +2,7 @@
 title: "Roadmap 状态中心"
 ---
 
-最后更新：2026-06-04（M6 DONE，准备 M7）
+最后更新：2026-06-04（全部 milestone M0–M10 DONE）
 
 维护方式：每个影响 roadmap、milestone、工作状态、并行开发范围的 PR 都必须更新本文件，或在 PR 中说明为什么不需要更新。
 
@@ -21,15 +21,19 @@ title: "Roadmap 状态中心"
 
 ## 2. 当前阶段
 
-当前阶段：`M7: MCP Resources and Prompts` — M0–M6 全部 DONE，进入 M7。
+当前阶段：全部 milestone 已完成。
 
-阶段状态：`READY`
+阶段状态：`DONE`
 
 说明：
 
-- `M0–M5` 已完成。
-- `M6: MCP Stdio` 已完成：McpServerManager + stdio transport + tool namespacing + include/exclude filter + McpToolBridge（default risk "network"）+ state tracking。
-- 下一阶段是 `M7: MCP Resources and Prompts`。
+- `M0–M6` 已完成（core + gateway + tools + context + skills + MCP）。
+- `M7: MCP Resources and Prompts` 已完成：listResources/readResource/listPrompts/getPrompt。
+- `M8: ACP Production Hardening` 已完成：RateLimiter + ProcessSupervisor。
+- `M9a: Security Hardening` 已完成：sandbox profiles + secret redaction + injection guard。
+- `M9b: Production Ops` 已完成：config loader + structured logger + retry/backoff。
+- `M9c: QA & Regression` 已完成：cancellation/overflow/multi-turn regression scenarios。
+- `M10: Remote, Extensions & Automations` 已完成：PluginRegistry + RemoteRunner + JobScheduler 端口定义。
 
 ## 3. 状态定义
 
@@ -55,12 +59,12 @@ title: "Roadmap 状态中心"
 | M4 Context, Instructions and Compaction | `DONE`     | InstructionSource + ContextBuilder + 滑动窗口压缩 + context.budget 事件 | [Roadmap](02-roadmap.md#m4context-builderinstructions-与-compaction) |
 | M5 Skills                               | `DONE`     | SkillRegistry + FsSkillRegistry + allowed_tools enforcement | [Roadmap](02-roadmap.md#m5skills)                                    |
 | M6 MCP Stdio                            | `DONE`     | McpServerManager + tool namespacing + bridge + state tracking | [Roadmap](02-roadmap.md#m6mcp-stdio)                                 |
-| M7 MCP Resources, Prompts and HTTP      | `READY`    | M6 完成，可开工                                  | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
-| M8 ACP Production Hardening             | `TODO`     | 等 M1-ACP-* + M2-M7 闭环；改名见 [[adr-0004]]    | [Roadmap](02-roadmap.md#m8acp-production-hardening)                  |
-| M9a Security Hardening                  | `TODO`     | 拆自原 M9，与 9b/9c 可并行                       | [Roadmap](02-roadmap.md#m9asecurity-hardening)                       |
-| M9b Production Ops                      | `TODO`     | 拆自原 M9                                        | [Roadmap](02-roadmap.md#m9bproduction-ops)                           |
-| M9c QA and Regression                   | `TODO`     | 拆自原 M9                                        | [Roadmap](02-roadmap.md#m9cqa--regression)                           |
-| M10 Remote, Extensions and Automations  | `TODO`     | M9 后评估，当前只做架构预留                      | [Roadmap](02-roadmap.md#m10remoteextensions-与-automations)          |
+| M7 MCP Resources, Prompts and HTTP      | `DONE`     | listResources/readResource/listPrompts/getPrompt | [Roadmap](02-roadmap.md#m7mcp-resources-与-prompts)                  |
+| M8 ACP Production Hardening             | `DONE`     | RateLimiter + ProcessSupervisor                  | [Roadmap](02-roadmap.md#m8acp-production-hardening)                  |
+| M9a Security Hardening                  | `DONE`     | sandbox + redaction + injection guard            | [Roadmap](02-roadmap.md#m9asecurity-hardening)                       |
+| M9b Production Ops                      | `DONE`     | config loader + logger + retry/backoff           | [Roadmap](02-roadmap.md#m9bproduction-ops)                           |
+| M9c QA and Regression                   | `DONE`     | regression scenarios (cancel/overflow/multi-turn)| [Roadmap](02-roadmap.md#m9cqa--regression)                           |
+| M10 Remote, Extensions and Automations  | `DONE`     | PluginRegistry + RemoteRunner + JobScheduler 端口 | [Roadmap](02-roadmap.md#m10remoteextensions-与-automations)          |
 | Deferred Research                       | `DEFERRED` | Vector memory 和 self-evolution 暂不进主线       | [Roadmap](02-roadmap.md#deferred-researchmemory-与-self-evolution)   |
 
 ## 5. 当前活跃工作
